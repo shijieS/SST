@@ -15,7 +15,7 @@ from utils.augmentations import SSJAugmentation, collate_fn
 from layer.sst_loss import SSTLoss
 import time
 import torchvision.utils as vutils
-from utils.operation import show_circle
+from utils.operation import show_circle, show_batch_circle_image
 
 str2bool = lambda v: v.lower() in ("yes", "true", "t", "1")
 
@@ -51,8 +51,10 @@ batch_size = args.batch_size
 max_iter = args.iterations
 weight_decay = args.weight_decay
 
-# stepvalues = (35000, 45000, 50000)
-stepvalues = (50000, 60000)
+# stepvalues = (40000, 50000)
+stepvalues = (70000, 75000)
+# stepvalues = (50000, 60000)
+# stepvalues = (85000, 100000)
 gamma = args.gamma
 momentum = args.momentum
 
@@ -171,7 +173,7 @@ def train():
         out = net(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next)
 
         optimizer.zero_grad()
-        loss_pre, loss_next, loss_similarity, loss, accuracy_pre, accuracy_next, accuracy = criterion(out, labels, valid_pre, valid_next)
+        loss_pre, loss_next, loss_similarity, loss, accuracy_pre, accuracy_next, accuracy, predict_indexes = criterion(out, labels, valid_pre, valid_next)
 
         loss.backward()
         optimizer.step()
@@ -179,7 +181,7 @@ def train():
 
         if iteration % 10 == 0:
             print('Timer: %.4f sec.' % (t1 - t0))
-            print('iter ' + repr(iteration) + ', ' + repr(epoch_size) + ' || epoch: %.4f ' % (iteration/(float)(epoch_size*args.batch_size)) + ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
+            print('iter ' + repr(iteration) + ', ' + repr(epoch_size) + ' || epoch: %.4f ' % (iteration/(float)(epoch_size)) + ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
 
         if args.tensorboard:
             # add scalar
@@ -196,19 +198,23 @@ def train():
             # add weights
             if iteration % 1000 == 0:
                 for name, param in net.named_parameters():
-                    writer.add_histogram(name, param.clone().cpu().data.numpy(), iteration)
+                    writer.add_histogram(name, param.clone().cpu().data.numpy(), iteration, bins='doane')
 
             # add images
-            if args.send_images and iteration % 1000 == 0:
+            if args.send_images and iteration % 200 == 0:
                 # add images
-                writer.add_image('WithoutLabel/Image_pre',
-                                 vutils.make_grid(img_pre.data, nrow=2, normalize=True, scale_each=True),iteration)
-                writer.add_image('WithoutLabel/Image_next',
-                                 vutils.make_grid(img_next.data, nrow=2, normalize=True, scale_each=True), iteration)
-                writer.add_image('WithLabel/Image_pre',
-                                 vutils.make_grid(show_circle(img_pre, boxes_pre, valid_pre), nrow=2, normalize=True, scale_each=True), iteration)
-                writer.add_image('WithLabel/Image_next',
-                                 vutils.make_grid(show_circle(img_next, boxes_next, valid_next), nrow=2, normalize=True, scale_each=True), iteration)
+                # writer.add_image('WithoutLabel/Image_pre',
+                #                  vutils.make_grid(img_pre.data, nrow=2, normalize=True, scale_each=True),iteration)
+                # writer.add_image('WithoutLabel/Image_next',
+                #                  vutils.make_grid(img_next.data, nrow=2, normalize=True, scale_each=True), iteration)
+                # writer.add_image('WithLabel/Image_pre',
+                #                  vutils.make_grid(show_circle(img_pre, boxes_pre, valid_pre), nrow=2, normalize=True, scale_each=True), iteration)
+                # writer.add_image('WithLabel/Image_next',
+                #                  vutils.make_grid(show_circle(img_next, boxes_next, valid_next), nrow=2, normalize=True, scale_each=True), iteration)
+
+                result_image = show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next, predict_indexes)
+                writer.add_image('WithLabel/ImageResult',
+                                 vutils.make_grid(result_image, nrow=2, normalize=True, scale_each=True), iteration)
 
         if iteration % 5000 == 0:
             print('Saving state, iter:', iteration)

@@ -84,14 +84,22 @@ class GTSingleParser:
         self.detection = pd.read_csv(self.detection_file_name, sep=' ', header=None, dtype=datatype)
 
         self.detection = self.detection.iloc[:, 0:17]
-        select_type_row = [not t in ('DontCare') for t in self.detection[2]]
+        select_type_row = [t in ('Van', 'Car', 'Pedestrian', 'Tram', 'Cyclist', 'Truck') for t in self.detection[2]]
+        self.detection = self.detection[select_type_row]
         select_occluded_row = [t in [0, 1] for t in self.detection[4]]
-        select_row = select_type_row and select_occluded_row
+        self.detection = self.detection[select_occluded_row]
 
-        self.detection = self.detection[select_row]
+        select_truncation_row = [t < 0.7 for t in self.detection[3]]
+        self.detection = self.detection[select_truncation_row]
+        # select_row = select_type_row and select_occluded_row
+
+        # self.detection = self.detection[select_row]
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())
-        self.max_frame_index = max(self.detection_group_keys)
+        if len(self.detection_group_keys) == 0:
+            self.max_frame_index = 0
+        else:
+            self.max_frame_index = max(self.detection_group_keys)
 
         # 3. update tracks
         self.tracks = Tracks()
@@ -258,6 +266,8 @@ class KITTITrainDataset(data.Dataset):
         self.max_object = max_object
         self.dataset_name = dataset_name
 
+        self.frame_gap_range = np.array([[i,-i] for i in range(1, 30)]).flatten();
+
         # 2. init GTParser
         self.parser = GTParser(self.kitti_image_root, self.kitti_detection_root)
 
@@ -265,8 +275,18 @@ class KITTITrainDataset(data.Dataset):
         current_image, current_box, next_image, next_box, labels = self.parser[item]
 
         wait_time = 0
+        current_index_gap = 0
+        # back data process
         while current_image is None:
-            current_image, current_box, next_image, next_box, labels = self.parser[max(item + random.randint(-config['max_gap_frame'], config['max_gap_frame']), 0)]
+            if current_index_gap < len(self.frame_gap_range):
+                current_image, current_box, next_image, next_box, labels = self.parser[max(item+self.frame_gap_range[current_index_gap], 0)]
+            elif current_index_gap < 100:
+                current_image, current_box, next_image, next_box, labels = self.parser[
+                    max(item + random.choice(list(range(30, 100))+list(range(-100, -30))), 0)]
+            else:
+                current_image, current_box, next_image, next_box, labels = self.parser[
+                    max(item + random.choice(list(range(100, 200)) + list(range(-200, -100))), 0)]
+            current_index_gap += 1
             # print('None processing.')
 
         if self.transform is None:

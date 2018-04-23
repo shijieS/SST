@@ -35,12 +35,13 @@ class KITTIDataReader:
         self.detection = pd.read_csv(self.detection_file_name,  sep=' ', header=None, dtype=datatype)
 
         self.detection = self.detection.iloc[:, 0:18]
-        select_type_row = [t in ('Pedestrian', 'Car') for t in self.detection[2]]
-        select_score_row = [t > 0 for t in self.detection[17]]
+        select_type_row = [t in ('Van', 'Car', 'Pedestrian', 'Tram', 'Cyclist', 'Truck') for t in self.detection[2]] #Pedestrian
+        self.detection = self.detection[select_type_row]
+        select_score_row = [t >= 0 for t in self.detection[17]]
+        self.detection = self.detection[select_score_row]
         select_occluded_row = [t in [0, 1] for t in self.detection[4]]
-        select_row = select_type_row and select_occluded_row and select_score_row
+        self.detection = self.detection[select_occluded_row]
 
-        self.detection = self.detection[select_row]
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())
 

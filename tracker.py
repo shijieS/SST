@@ -55,9 +55,9 @@ class Track:
     '''
     '''for kitti
     '''
-    _max_age = 20
-    _max_num_node = 20
-    _max_save_feature = 10
+    _max_age = 5
+    _max_num_node = 5
+    _max_save_feature = 5
     def __init__(self):
         self.nodes = list()
         self.id = Track._id_pool

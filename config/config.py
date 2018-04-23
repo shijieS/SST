@@ -286,44 +286,33 @@ def init_train_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
     config['kitti_detection_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/tracking_label_2'
     config['base_net_folder'] = '/home/ssm/ssj/weights/KITTI/vgg16_reducedfc.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/KITTI/log0406-I60k-M80-G30-V2'
-    config['save_folder'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G30-V2'
+    config['log_folder'] = '/home/ssm/ssj/weights/KITTI/log0406-I60k-M80-G5-C10-All-Continue'
+    config['save_folder'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue'
     config['type'] = 'train'
     config['dataset_type'] = 'training'
-    config['resume'] = None
-    config['start_iter'] = 0
+    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_55000.pth' #None
+    config['start_iter'] = 55050
     config['cuda'] = True
     config['min_gap_frame'] = 0
     config['batch_size'] = 8
     config['num_workers'] = 16
-    config['iterations'] = 65050
-    config['learning_rate'] = 1e-2
+    config['iterations'] = 80050
+    config['learning_rate'] = 1e-3
     config['false_constant'] = 10
     config['max_object'] = 80
-    config['max_gap_frame'] = 30
+    config['max_gap_frame'] = 5
     config['min_gap_frame'] = 0
-
-# init_train_kitti()
+init_train_kitti()
 
 def init_test_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
-    config['kitti_detection_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/tracking_label_2'
-    config['base_net_folder'] = '/home/ssm/ssj/weights/KITTI/vgg16_reducedfc.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/KITTI/log0406-I60k-M80-G30-V2'
-    config['save_folder'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G30-V2'
+    config['kitti_detection_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/det_2_lsvm'
     config['type'] = 'train'
     config['dataset_type'] = 'training'
-    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G30-V2/ssj300_0712_60000.pth'
-    config['start_iter'] = 0
+    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_55000.pth'
     config['cuda'] = True
-    config['min_gap_frame'] = 0
     config['batch_size'] = 1
-    config['num_workers'] = 16
-    config['iterations'] = 65050
-    config['learning_rate'] = 1e-2
     config['false_constant'] = 10
     config['max_object'] = 80
-    config['max_gap_frame'] = 30
-    config['min_gap_frame'] = 0
 
-init_test_kitti()
+# init_test_kitti()

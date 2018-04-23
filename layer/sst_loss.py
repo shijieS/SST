@@ -63,23 +63,27 @@ class SSTLoss(nn.Module):
             loss_similarity = (target_union * (torch.abs((1-input_pre) - (1-input_next)))).sum()
 
         _, indexes_ = target_pre.max(3)
+        indexes_ = indexes_[:, :, :-1]
         _, indexes_pre = input_all.max(3)
-        mask_pre_num = mask_pre.sum().data[0] - 1
+        indexes_pre = indexes_pre[:, :, :-1]
+        mask_pre_num = mask_pre[:, :, :-1].sum().data[0]
         if mask_pre_num:
-            accuracy_pre = (indexes_pre[mask_pre][:-1] == indexes_[mask_pre][:-1]).float().sum() / mask_pre_num
+            accuracy_pre = (indexes_pre[mask_pre[:, :, :-1]] == indexes_[mask_pre[:,:, :-1]]).float().sum() / mask_pre_num
         else:
-            accuracy_pre = (indexes_pre[mask_pre][:-1] == indexes_[mask_pre][:-1]).float().sum() + 1
+            accuracy_pre = (indexes_pre[mask_pre[:, :, :-1]] == indexes_[mask_pre[:, :, :-1]]).float().sum() + 1
 
-        _, indexes_ = target.max(2)
+        _, indexes_ = target_next.max(2)
+        indexes_ = indexes_[:, :, :-1]
         _, indexes_next = input_next.max(2)
-        mask_next_num = mask_next.sum().data[0] - 1
+        indexes_next = indexes_next[:, :, :-1]
+        mask_next_num = mask_next[:, :, :-1].sum().data[0]
         if mask_next_num:
-            accuracy_next = (indexes_next[mask_next][:-1] == indexes_[mask_next][:-1]).float().sum() / mask_next_num
+            accuracy_next = (indexes_next[mask_next[:, :, :-1]] == indexes_[mask_next[:, :, :-1]]).float().sum() / mask_next_num
         else:
-            accuracy_next = (indexes_next[mask_next][:-1] == indexes_[mask_next][:-1]).float().sum() + 1
+            accuracy_next = (indexes_next[mask_next[:, :, :-1]] == indexes_[mask_next[:, :, :-1]]).float().sum() + 1
 
         return loss_pre, loss_next, loss_similarity, \
-               (loss_pre + loss_next + loss + loss_similarity)/4.0, accuracy_pre, accuracy_next, (accuracy_pre + accuracy_next)/2.0
+               (loss_pre + loss_next + loss + loss_similarity)/4.0, accuracy_pre, accuracy_next, (accuracy_pre + accuracy_next)/2.0, indexes_pre
 
     def getProperty(self, input, target, mask0, mask1):
         return self.forward(input, target, mask0, mask1)

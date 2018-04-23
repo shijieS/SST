@@ -32,7 +32,7 @@ def show_circle(img, boxes, valid):
         valid1 = valid[i, 0, :-1].data.cpu().numpy()
         boxes1 = boxes[i, :, 0, 0, :].data.cpu().numpy()
         boxes1 = boxes1[valid1==1]
-        img1 = img1.astype(np.uint8).copy()
+        img1 = np.clip(img1, 0, 255).astype(np.uint8).copy()
         for b in boxes1:
             img1 = cv2.circle(img1, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [255, 0, 0], thickness=3)
 
@@ -225,5 +225,57 @@ def show_matching_rectangle(img_pre, img_next, boxes_pre, boxes_next, labels, sh
                      2)
 
     return img
+
+
+def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next, indexes):
+    batch_size = img_pre.shape[0]
+    images = list()
+    h = config['sst_dim']
+    for i in range(batch_size):
+        img1 = img_pre[i, :].permute(1, 2, 0).data
+        img1 = img1.cpu().numpy() + config['mean_pixel']
+        valid1 = valid_pre[i, 0, :-1].data.cpu().numpy()
+        boxes1 = boxes_pre[i, :, 0, 0, :].data.cpu().numpy()
+        boxes1 = boxes1[valid1 == 1]
+        img1 = np.clip(img1, 0, 255).astype(np.uint8).copy()
+
+        index = indexes[i, 0, :].data.cpu().numpy()[valid1==1]
+
+        img2 = img_next[i, :].permute(1, 2, 0).data
+        img2 = img2.cpu().numpy() + config['mean_pixel']
+        valid2 = valid_next[i, 0, :-1].data.cpu().numpy()
+        boxes2 = boxes_next[i, :, 0, 0, :].data.cpu().numpy()
+        boxes2 = boxes2[valid2 == 1]
+        img2 = np.clip(img2, 0, 255).astype(np.uint8).copy()
+
+        # draw all circle
+        for b in boxes1:
+            img1 = cv2.circle(img1, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [255, 0, 0],
+                              thickness=3)
+
+        for b in boxes2:
+            img2 = cv2.circle(img2, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [255, 0, 0],
+                              thickness=3)
+
+        # connect the boxes
+        img = np.concatenate([img1, img2], axis=0)
+
+        # draw the connected boxes
+        for j, b1 in enumerate(boxes1):
+            if index[j] >= config['max_object']:
+                continue
+
+            color = tuple((np.random.rand(3) * 255).astype(int).tolist())
+            start_pt = tuple(((b1 + 1) / 2.0 * config['sst_dim']).astype(int))
+            b2 = boxes_next[i, :, 0, 0, :].data.cpu().numpy()[index[j]]
+            end_pt = tuple(((b2 + 1) / 2.0 * config['sst_dim']).astype(int))
+            end_pt = (end_pt[0], end_pt[1]+h)
+            img = cv2.circle(img, start_pt, 20, color, thickness=3)
+            img = cv2.circle(img, end_pt, 20, color, thickness=3)
+            img = cv2.line(img, start_pt, end_pt, color, thickness=3)
+
+        img = torch.from_numpy(img.astype(np.float) - config['mean_pixel']).permute(2, 0, 1)
+        images.append(img)
+    return torch.stack(images, dim=0)
 
 

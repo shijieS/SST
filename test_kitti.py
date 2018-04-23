@@ -9,11 +9,11 @@ import os
 
 parser = argparse.ArgumentParser(description='Single Shot Joint Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
-parser.add_argument('--kitti_image_root', default='/home/ssm/ssj/dataset/KITTI/tracking/image_2', help='MOT ROOT')
-parser.add_argument('--kitti_detection_root', default='/home/ssm/ssj/dataset/KITTI/tracking/det_2_lsvm', help='MOT ROOT')
-parser.add_argument('--type', default='training', help='training/testing')
+parser.add_argument('--kitti_image_root', default=config['kitti_image_root'], help='MOT ROOT')
+parser.add_argument('--kitti_detection_root', default=config['kitti_detection_root'], help='MOT ROOT')
+parser.add_argument('--type', default=config['dataset_type'], help='training/testing')
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=True, help='save video if true')
+parser.add_argument('--save_video', default=False, help='save video if true')
 
 args = parser.parse_args()
 
@@ -75,7 +75,7 @@ def test():
             print('{}:{}, {}\r'.format(save_file_name, i, int(i*100/len(reader))))
             if args.show_image and not image_org is None and image_org.shape[0]>0:
                 cv2.imshow('res', image_org)
-                cv2.waitKey(10)
+                cv2.waitKey(0)
 
             if args.save_video and not image_org is None  and image_org.shape[0]>0:
                 vw.write(image_org)
