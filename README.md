@@ -4,7 +4,8 @@ Designing an end-to-end deep learning tracker.
 ## Task
 |Title|Start|Due|Detail| Status |
 |---|---|---|---|---|
-|Train with gap frame 5|  2018/04/18  | 2018/04/20  | Training the sst with the parameter (gap frame 5)  | Doing |
+|Optimize the training process of KITTI| 2018/04/23 | 2018/04/26| needs to reach 95%+ | doing |
+|Train with gap frame 5|  2018/04/18  | 2018/04/20  | Training the sst with the parameter (gap frame 5)  | Finish |
 Test KITTI | 2018/04/18 | 2018/04/20 | Get the result of KITTI and upload the result to the official website.| delay |
 Continue Train KITTI | 2018/04/16 | 2018/04/18 | Continue training KITTI|Finish|
 Training KITTI dataset | 2018/04/11 | 2018/04/16 | Training KITTI dataset   |   Finish |
@@ -27,8 +28,8 @@ Our network is designed by pytorch framework. It is also trained and tested in U
 
 # Best Result
 
-![](./image/accuracy20180419.png)
-![](./image/training20180419.png)
+![](./image/accuracy20180420.png)
+![](./image/training20180420.png)
 
 see [current training log](http://ssjhttp.ssj-server.me:8083)
 
@@ -108,6 +109,17 @@ PYTHONPATH=. python test_kitti.py
 ```
 
 # Log
+## 2018/04/23 Continue Training KITTI
+The accuracy of training kitti reaches at about 92%
+
+|parameter name | value     |
+|---            |---        |
+|learning rate  | 0~40k(1e-2), 40k~50k(1e-3), 50k~55k(1e-4), 55k~70k(1e-3), 70k~75k(1e-4), 75k~80k(1e-5)|
+|max gap        | 5         |
+
+![](./image/accuracy20180420.png)
+![](./image/training20180420.png)
+
 ## 2018/04/19 Problems
 We find that it is a very difficult task when the gap frame is 30. Because, there 10m when the car's speed is 30km/s. What's more, the car has similar appearance, so it's hard to decide whether its a new object or not. As a result, the accuracy of sst net is about 83% shown as follows.
 
