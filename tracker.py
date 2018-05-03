@@ -55,9 +55,9 @@ class Track:
     '''
     '''for kitti
     '''
-    _max_age = 5
+    _max_age = 10
     _max_num_node = 5
-    _max_save_feature = 5
+    _max_save_feature = 4
     def __init__(self):
         self.nodes = list()
         self.id = Track._id_pool
@@ -293,6 +293,9 @@ class SSTTracker:
         res = {}
         id_num = {}
         for id, y in zip(ids, ys):
+            index_id = range(len(id))
+            sum_index = sum(index_id)
+            weight = [(i+1) / (sum_index+1) for i in index_id]
             for i in id:
                 res.setdefault(i[0], []).append(y[id.index(i), :])
 

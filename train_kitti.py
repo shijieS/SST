@@ -52,7 +52,8 @@ max_iter = args.iterations
 weight_decay = args.weight_decay
 
 # stepvalues = (40000, 50000)
-stepvalues = (70000, 75000)
+# stepvalues = (105000, 115000)
+stepvalues = (0, 140050)
 # stepvalues = (50000, 60000)
 # stepvalues = (85000, 100000)
 gamma = args.gamma

@@ -55,6 +55,11 @@ see [current training log](http://ssjhttp.ssj-server.me:8083)
 ![](./image/coolexample10.png)
 
 ![](./image/coolexample11.png)
+
+![](./image/coolexample12.png)
+
+![](./image/coolexample13.png)
+
 # Problem
 
 ![](./image/problem1.png)

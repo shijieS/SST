@@ -290,29 +290,29 @@ def init_train_kitti():
     config['save_folder'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue'
     config['type'] = 'train'
     config['dataset_type'] = 'training'
-    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_55000.pth' #None
-    config['start_iter'] = 55050
+    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_140000.pth' #None
+    config['start_iter'] = 130050
     config['cuda'] = True
     config['min_gap_frame'] = 0
     config['batch_size'] = 8
     config['num_workers'] = 16
-    config['iterations'] = 80050
-    config['learning_rate'] = 1e-3
+    config['iterations'] = 140050
+    config['learning_rate'] = 1e-4
     config['false_constant'] = 10
     config['max_object'] = 80
     config['max_gap_frame'] = 5
     config['min_gap_frame'] = 0
-init_train_kitti()
+# init_train_kitti()
 
 def init_test_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
     config['kitti_detection_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/det_2_lsvm'
     config['type'] = 'train'
     config['dataset_type'] = 'training'
-    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_55000.pth'
+    config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_140000.pth'
     config['cuda'] = True
     config['batch_size'] = 1
     config['false_constant'] = 10
     config['max_object'] = 80
 
-# init_test_kitti()
+init_test_kitti()
