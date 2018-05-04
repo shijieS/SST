@@ -118,7 +118,7 @@ class SST(nn.Module):
             new_data = Variable(torch.ones(shape) * constant)
         return torch.cat([x, new_data], dim=dim)
 
-    def forward_stacker_features(self, xp, xn):
+    def forward_stacker_features(self, xp, xn, fill_up_column=True):
         pre_rest_num = self.max_object - xp.shape[1]
         next_rest_num = self.max_object - xn.shape[1]
         pre_num = xp.shape[1]
@@ -157,7 +157,7 @@ class SST(nn.Module):
         x[0:pre_num, 0:next_num] = torch.max(x_f[0:pre_num, 0:next_num], x_t[0:pre_num, 0:next_num])
         print(next_num, pre_num)
         x[:, next_num:next_num+1] = x_f[:pre_num, next_num:next_num+1]
-        if pre_num > 1:
+        if fill_up_column and pre_num > 1:
             x = torch.cat([x, x[:, next_num:next_num+1].repeat(1, pre_num-1)], dim=1)
 
         if self.use_gpu:

@@ -51,7 +51,7 @@ class FeatureRecorder:
 
             self.all_similarity[frame_index] = {}
             for pre_index in self.all_frame_index[:-1]:
-                pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), features)
+                pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), Variable(features), fill_up_column=False)
                 self.all_similarity[frame_index][pre_index] = pre_similarity
         else:
             self.all_features[frame_index] = features
@@ -123,7 +123,7 @@ class Track:
 
     def __init__(self):
         self.s = np.zeros((TrackerConfig.max_track_node, TrackerConfig.max_track_node), dtype=np.float) # similarity score
-        self.f = np.array(range(TrackerConfig.max_track_node), dtype=int)
+        self.f = np.array([], dtype=int)  # recorded frame
         self.uv = np.zeros((TrackerConfig.max_track_node, TrackerConfig.max_track_node), dtype=int) # the box index
         self.id = Track._id_pool
         Track._id_pool += 1
@@ -131,10 +131,9 @@ class Track:
         self.color = tuple((np.random.rand(3) * 255).astype(int).tolist())
 
     def update(self, frame_index, similarity, index):
-        if frame_index not in self.f:
+        if len(self.f) == TrackerConfig.max_track_node:
             # remove the first item
             self.f = self.f[1:]
-            self.f = np.append(self.f, frame_index)
             s = np.zeros((TrackerConfig.max_track_node, TrackerConfig.max_track_node), dtype=np.float)
             s[:-1, :-1] = self.s[1:, 1:]
             self.s = s
@@ -142,15 +141,35 @@ class Track:
             uv[:-1, :-1] = self.uv[1:, 1:]
             self.uv = uv
 
-        i = self.f.__index__(frame_index)
-        self.s[:, i] = similarity
-        self.uv[:, i] = index
+        self.f = np.append(self.f, frame_index)
+        i = len(self.f) - 1
+        self.s[:len(similarity), i] = similarity
+        self.uv[:len(index), i] = index
 
     def add_age(self):
         self.age += 1
 
     def reset_age(self):
         self.age = 0
+
+    def get_all_nodes(self, recorder):
+        all_nodes = []
+        for i, f in enumerate(self.f):
+            id = self.uv[i, i]
+            if id == -1:
+                continue
+            all_nodes.append(recorder.all_boxes[f][id, :])
+
+        return all_nodes
+
+    def get_current_box(self, recorder):
+        if len(self.f) > 0 and self.age == 0:
+            frame_index = self.f[-1]
+            i = len(self.f) - 1
+            id = self.uv[i, i]
+            if id != -1:
+                return recorder.all_boxes[frame_index][id, :]
+        return None
 
 class TrackUtil:
     @staticmethod
@@ -214,6 +233,77 @@ class TrackSet:
     def __len__(self):
         return len(self.tracks)
 
+    def get_similarity_uv(self, t, frame_index):
+        res_similarity = []
+        res_uv = []
+        for i, f in enumerate(t.f):
+            if len(t.f) == TrackerConfig.max_track_node and i == 0:
+                continue
+            all_similarity = self.recorder.all_similarity[frame_index][f]
+            selected_box_index = t.uv[i, i]
+            if selected_box_index == -1: # cannot find box in f frame.
+                res_similarity += [0]
+                res_uv += [-1]
+                continue
+
+            max_index = np.argmax(all_similarity[selected_box_index, :])
+            max_value = all_similarity[selected_box_index, max_index]
+            if max_index == all_similarity.shape[1] - 1: # new node
+                max_index = -1
+            res_uv += [int(max_index)]
+            res_similarity += [float(max_value)]
+
+        # get the representation box of this frame.
+        res = {}
+        for uv, s in zip(res_uv, res_similarity):
+            if uv not in res:
+                res[uv] = s
+            else:
+                res[uv] += s
+        print(frame_index)
+        print(res)
+        max_uv = max(res.keys(), key=(lambda k: res[k]))
+        res_similarity += [1]
+        res_uv += [max_uv]
+
+        if max_uv == -1:
+            t.age += 1
+        else:
+            t.age = 0
+
+        return res_similarity, res_uv
+
+
+    def show(self, image):
+        h, w, _ = image.shape
+
+        # draw rectangle
+        for t in self.tracks:
+            b = t.get_current_box(self.recorder)
+            if not b is None:
+                image = cv2.putText(image, str(t.id), (int(b[0] * w), int((b[1]) * h)), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                    t.color, 3)
+                image = cv2.rectangle(image, (int(b[0] * w), int((b[1]) * h)),
+                                      (int((b[0] + b[2]) * w), int((b[1] + b[3]) * h)), t.color, 2)
+
+        # draw line
+        for t in self.tracks:
+            if t.age > 1:
+                continue
+            nodes = t.get_all_nodes(self.recorder)
+            if len(nodes) > self.max_drawing_track:
+                start = len(t.nodes) - self.max_drawing_track
+            else:
+                start = 0
+            for n1, n2 in zip(nodes[start:], nodes[start + 1:]):
+                c1 = (int((n1[0] + n1[2] / 2.0) * w), int((n1[1] + n1[3]) * h))
+                c2 = (int((n2[0] + n1[2] / 2.0) * w), int((n2[1] + n2[3]) * h))
+                image = cv2.line(image, c1, c2, t.color, 2)
+
+        return image
+
+
+
     def update(self, image, detection, show_image):
         '''
         1. get all the detection features and update the feature recorder
@@ -233,14 +323,29 @@ class TrackSet:
             for i in range(len(detection)):
                 t = Track()
                 t.update(0, [1], [i])
+                self.tracks.append(t)
 
         else:
             # get all similarity between each frame
+            record_id = []
             for t in self.tracks:
-                all_match_id = np.argmax(self.recorder.all_similarity[frame_index], axis=1)
-                similarity = [self.recorder.all_similarity[f][m] for f in t.f for m in all_match_id]
-                t.update(frame_index, similarity, all_match_id)
+                # get every boxes in current frame's similarity.
+                similarity, uv = self.get_similarity_uv(t, frame_index)
+                record_id += uv[-1:]  # record the respresentation
+                t.update(frame_index, similarity, uv)
 
-            # in order to judge whether to create new track or not, we need to do summary for current track set
-            pass
+            # add new tracks
+            for i in range(len(detection)):
+                if i not in record_id:
+                    t = Track()
+                    t.update(frame_index, [1], [i])
+                    self.tracks.append(t)
+
+        # remove older track
+        self.tracks = [t for t in self.tracks if t.age < TrackerConfig.max_track_age]
+
         self.frame_index += 1
+
+        if show_image:
+            image = self.show(image)
+            return image

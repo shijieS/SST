@@ -83,6 +83,7 @@ def test():
 
             # save result
             for t in tracker.tracks:
+                continue
                 n = t.nodes[-1]
                 if t.age == 1:
                     b = n.box
