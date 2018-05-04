@@ -186,7 +186,7 @@ class Tracks:
                 start = 0
             for n1, n2 in zip(t.nodes[start:], t.nodes[start+1:]):
                 c1 = (int((n1.box[0] + n1.box[2]/2.0)*w), int((n1.box[1] + n1.box[3])*h))
-                c2 = (int((n2.box[0] + n1.box[2] / 2.0) * w), int((n2.box[1] + n2.box[3]) * h))
+                c2 = (int((n2.box[0] + n2.box[2] / 2.0) * w), int((n2.box[1] + n2.box[3]) * h))
                 image = cv2.line(image, c1, c2, t.color, 2)
 
         return image

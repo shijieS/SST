@@ -10,15 +10,20 @@ import matplotlib.pyplot as plt
 
 class TrackerConfig:
 
-    max_record_frame = 10
-    max_track_age = 10
-    max_track_node = 5
+    max_record_frame = 15
+    max_track_age = 15
+    max_track_node = 8
     max_draw_track_node = 5
 
     sst_model_path = config['resume']
     cuda = config['cuda']
     mean_pixel = config['mean_pixel']
     image_size = (config['sst_dim'], config['sst_dim'])
+
+    min_iou_frame_gap = [1, 2, 3, 4]
+    min_iou = [pow(0.2, i) for i in min_iou_frame_gap]
+
+    merge_threshold = 0.5
 
 
 class FeatureRecorder:
@@ -32,6 +37,7 @@ class FeatureRecorder:
         self.all_features = {}
         self.all_boxes = {}
         self.all_similarity = {}
+        self.all_iou = {}
 
     def update(self, sst, frame_index, features, boxes):
         # if the coming frame in the new frame
@@ -42,6 +48,7 @@ class FeatureRecorder:
                 del self.all_features[del_frame]
                 del self.all_boxes[del_frame]
                 del self.all_similarity[del_frame]
+                del self.all_iou[del_frame]
                 self.all_frame_index = self.all_frame_index[1:]
 
             # add new item for all_frame_index, all_features and all_boxes. Besides, also add new similarity
@@ -53,6 +60,11 @@ class FeatureRecorder:
             for pre_index in self.all_frame_index[:-1]:
                 pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), Variable(features), fill_up_column=False)
                 self.all_similarity[frame_index][pre_index] = pre_similarity
+
+            self.all_iou[frame_index] = {}
+            for pre_index in self.all_frame_index[:-1]:
+                iou = TrackUtil.get_iou(self.all_boxes[pre_index], boxes)
+                self.all_iou[frame_index][pre_index] = iou
         else:
             self.all_features[frame_index] = features
             self.all_boxes[frame_index] = boxes
@@ -62,8 +74,11 @@ class FeatureRecorder:
                 if pre_index == self.all_frame_index[-1]:
                     continue
 
-                pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), self.all_frame_index[-1])
+                pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), Variable(self.all_features[-1]))
                 self.all_similarity[frame_index][pre_index] = pre_similarity
+
+                iou = TrackUtil.get_iou(self.all_boxes[pre_index], boxes)
+                self.all_similarity[frame_index][pre_index] = iou
 
     def get_feature(self, frame_index, detection_index):
         '''
@@ -129,6 +144,7 @@ class Track:
         Track._id_pool += 1
         self.age = 0
         self.color = tuple((np.random.rand(3) * 255).astype(int).tolist())
+        self.valid = True
 
     def update(self, frame_index, similarity, index):
         if len(self.f) == TrackerConfig.max_track_node:
@@ -206,6 +222,48 @@ class TrackUtil:
             return Variable(image.cuda())
         return Variable(image)
 
+    @staticmethod
+    def get_iou(pre_boxes, next_boxes):
+        h = len(pre_boxes)
+        w = len(next_boxes)
+        if h == 0 or w == 0:
+            return []
+
+        iou = np.zeros((h, w), dtype=float)
+        for i in range(h):
+            b1 = np.copy(pre_boxes[i, :])
+            b1[2:] = b1[:2] + b1[2:]
+            for j in range(w):
+                b2 = np.copy(next_boxes[j, :])
+                b2[2:] = b2[:2] + b2[2:]
+                overlap = max(min(b1[2], b2[2]) - max(b1[0], b2[0]), 0) * max(min(b1[3], b2[3])-max(b1[1], b2[1]), 0)
+                area = (b1[2]-b1[0])*(b1[3]-b1[1]) + (b2[2]-b2[0])*(b2[3]-b2[1]) - overlap
+                iou[i,j] = overlap / area
+
+        return iou
+
+    @staticmethod
+    def get_merge_value(t1, t2):
+        merge_value = 0
+        if t1 is t2:
+            return merge_value
+
+        for i, f1 in enumerate(t1.f):
+            for j, f2 in enumerate(t2.f):
+                if f1 == f2 and t1.uv[i, i] == t2.uv[j, j] and t1.uv[i, i] != -1:
+                    merge_value += 1
+        return merge_value / float(TrackerConfig.max_track_node)
+
+    @staticmethod
+    def merge(t1, t2):
+        if t1.id < t2.id:
+            t2.valid = False
+        else:
+            t1.valid = False
+
+
+
+
 
 class TrackSet:
     def __init__(self):
@@ -239,6 +297,9 @@ class TrackSet:
         for i, f in enumerate(t.f):
             if len(t.f) == TrackerConfig.max_track_node and i == 0:
                 continue
+
+
+            all_iou = self.recorder.all_iou[frame_index][f]
             all_similarity = self.recorder.all_similarity[frame_index][f]
             selected_box_index = t.uv[i, i]
             if selected_box_index == -1: # cannot find box in f frame.
@@ -246,7 +307,14 @@ class TrackSet:
                 res_uv += [-1]
                 continue
 
-            max_index = np.argmax(all_similarity[selected_box_index, :])
+            selected_similarity = all_similarity[selected_box_index, :]
+            if frame_index - f in TrackerConfig.min_iou_frame_gap:
+                iou_index = TrackerConfig.min_iou_frame_gap.index(frame_index-f)
+                selected_iou = (all_iou[selected_box_index, :] >= TrackerConfig.min_iou[iou_index]).astype(float)
+                selected_iou = np.append(selected_iou, 1.0)
+                selected_similarity = selected_similarity * selected_iou
+            max_index = np.argmax(selected_similarity)
+
             max_value = all_similarity[selected_box_index, max_index]
             if max_index == all_similarity.shape[1] - 1: # new node
                 max_index = -1
@@ -273,7 +341,6 @@ class TrackSet:
 
         return res_similarity, res_uv
 
-
     def show(self, image):
         h, w, _ = image.shape
 
@@ -292,17 +359,16 @@ class TrackSet:
                 continue
             nodes = t.get_all_nodes(self.recorder)
             if len(nodes) > self.max_drawing_track:
-                start = len(t.nodes) - self.max_drawing_track
+                start = len(nodes) - self.max_drawing_track
             else:
                 start = 0
+
             for n1, n2 in zip(nodes[start:], nodes[start + 1:]):
                 c1 = (int((n1[0] + n1[2] / 2.0) * w), int((n1[1] + n1[3]) * h))
-                c2 = (int((n2[0] + n1[2] / 2.0) * w), int((n2[1] + n2[3]) * h))
+                c2 = (int((n2[0] + n2[2] / 2.0) * w), int((n2[1] + n2[3]) * h))
                 image = cv2.line(image, c1, c2, t.color, 2)
 
         return image
-
-
 
     def update(self, image, detection, show_image):
         '''
@@ -345,6 +411,24 @@ class TrackSet:
         self.tracks = [t for t in self.tracks if t.age < TrackerConfig.max_track_age]
 
         self.frame_index += 1
+
+        # merge tracks
+        l_track = len(self.tracks)
+        if l_track != 0:
+            merge_matrix = np.zeros((l_track, l_track), dtype=float)
+            for i, t1 in enumerate(self.tracks):
+                for j, t2 in enumerate(self.tracks):
+                    merge_matrix[i, j] = TrackUtil.get_merge_value(t1, t2)
+
+            merge_matrix = merge_matrix > TrackerConfig.merge_threshold
+            if sum(sum(merge_matrix))  > 0:
+                for i in range(l_track):
+                    if self.tracks[i].valid:
+                        for j in range(l_track):
+                            if self.tracks[j].valid and merge_matrix[i, j]:
+                                TrackUtil.merge(self.tracks[i], self.tracks[j])
+
+            self.tracks = [t for t in self.tracks if t.valid]
 
         if show_image:
             image = self.show(image)
