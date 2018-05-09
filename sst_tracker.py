@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 
 class TrackerConfig:
 
-    max_record_frame = 15
-    max_track_age = 15
-    max_track_node = 8
+    max_record_frame = 20
+    max_track_age = 20
+    max_track_node = 20
     max_draw_track_node = 5
 
     sst_model_path = config['resume']
@@ -21,9 +21,9 @@ class TrackerConfig:
     image_size = (config['sst_dim'], config['sst_dim'])
 
     min_iou_frame_gap = [1, 2, 3, 4]
-    min_iou = [pow(0.2, i) for i in min_iou_frame_gap]
+    min_iou = [pow(0.1, i) for i in min_iou_frame_gap]
 
-    merge_threshold = 0.5
+    merge_threshold = 0.1
 
 
 class FeatureRecorder:
@@ -187,6 +187,39 @@ class Track:
                 return recorder.all_boxes[frame_index][id, :]
         return None
 
+    def get_total_similarity(self):
+        total_similarity = []
+        total_count = 0
+        for i, f in enumerate(self.f):
+            if self.s[i, i] > 0:
+                total_similarity += [self.s[i, i]]
+                total_count += 1
+
+        if total_count == 0:
+            return 0
+        else:
+            return min(total_similarity)
+
+    def remove_similarity_node(self, t):
+        for i, f in enumerate(t.f):
+            if f in self.f:
+                id1 = t.uv[i, i]
+                index = np.where(self.f==f)[0][0]
+                id = self.uv[index, index]
+                if id == id1:
+                    self.uv[index, index] = -1
+
+        # if remove all the nodes, then remove this track
+        is_valid = False
+        for i, f in enumerate(self.f):
+            if self.uv[i, i] != -1:
+                is_valid = True
+                break
+
+        self.valid = is_valid
+
+
+
 class TrackUtil:
     @staticmethod
     def convert_detection(detection):
@@ -256,13 +289,23 @@ class TrackUtil:
 
     @staticmethod
     def merge(t1, t2):
-        if t1.id < t2.id:
-            t2.valid = False
+        # keep the track with the highest matching probability.
+        # remove the overlapped node of the bad one
+        s1 = t1.get_total_similarity()
+        s2 = t2.get_total_similarity()
+
+        is_t1 = False
+        if s1 == 0 and s2 == 0:
+            if t1.id > t2.id:
+                is_t1 = True
         else:
-            t1.valid = False
+            if s1 < s2:
+                is_t1 = True
 
-
-
+        if is_t1:
+            t1.remove_similarity_node(t2)
+        else:
+            t2.remove_similarity_node(t1)
 
 
 class TrackSet:
@@ -397,7 +440,7 @@ class TrackSet:
             for t in self.tracks:
                 # get every boxes in current frame's similarity.
                 similarity, uv = self.get_similarity_uv(t, frame_index)
-                record_id += uv[-1:]  # record the respresentation
+                record_id += uv[-1:]  # record the representation
                 t.update(frame_index, similarity, uv)
 
             # add new tracks

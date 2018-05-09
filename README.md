@@ -4,7 +4,9 @@ Designing an end-to-end deep learning tracker.
 ## Task
 |Title|Start|Due|Detail| Status |
 |---|---|---|---|---|
-|Optimize the training process of KITTI| 2018/04/23 | 2018/04/26| needs to reach 95%+ | doing |
+| optimize the new framework | 2018/05/09 | 2018/05/09 | at each stage (update/merge/remove), optimize them all. 1. when merging the overlapped tracks, I cannot just remove the bad one. On the contrary, we should remove the overlapped nodes. | doing|
+| design the new structure of tracking | 2018/05/07 | 2018/05/09| using the belief matrix to design a new pipeline of tracking | finish|
+|Optimize the training process of KITTI| 2018/04/23 | 2018/04/26| needs to reach 95%+ | fail |
 |Train with gap frame 5|  2018/04/18  | 2018/04/20  | Training the sst with the parameter (gap frame 5)  | Finish |
 Test KITTI | 2018/04/18 | 2018/04/20 | Get the result of KITTI and upload the result to the official website.| delay |
 Continue Train KITTI | 2018/04/16 | 2018/04/18 | Continue training KITTI|Finish|

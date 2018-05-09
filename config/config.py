@@ -257,7 +257,7 @@ def init_tracker_config():
 '''
 test mot train dataset
 '''
-def init_test_mottraindataset():
+def init_test_mot16():
     '''
     ssm
     '''
@@ -268,16 +268,23 @@ def init_test_mottraindataset():
     config['tensorboard'] = True
     config['save_combine'] = False
     config['type'] = 'test'
-    # config['origin_image_height'] = 1080
-    # config['origin_image_width'] = 1920
-    '''
-    openstack server
-    '''
-    # config['mot_root'] = r'F:\PeopleCounting\dataset\MOT\17\MOT17'
-    # config['detector'] = 'FRCNN'
 
-# init_test_mottraindataset()
+# init_test_mot16()
 
+
+def init_test_mot17():
+    '''
+    ssm
+    '''
+    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30/ssj300_0712_80000.pth'
+    config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
+    config['batch_size'] = 1
+    config['write_file'] = True
+    config['tensorboard'] = True
+    config['save_combine'] = False
+    config['type'] = 'test'
+
+init_test_mot17()
 
 '''
 train kitti dataset
@@ -315,4 +322,4 @@ def init_test_kitti():
     config['false_constant'] = 10
     config['max_object'] = 80
 
-init_test_kitti()
+# init_test_kitti()
