@@ -1,5 +1,5 @@
-# from tracker import SSTTracker
-from sst_tracker import TrackSet as SSTTracker
+from tracker import SSTTracker
+# from sst_tracker import TrackSet as SSTTracker
 import cv2
 from data.mot_data_reader import MOTDataReader
 import numpy as np
@@ -13,7 +13,7 @@ parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=False, help='save video if true')
+parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
@@ -23,13 +23,13 @@ def test():
         dataset_index = [2, 4, 5, 9, 10, 11, 13]
         # dataset_index = [10]
         dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
-        dataset_detection_type = {'-FRCNN'}
+        dataset_detection_type = {'-FRCNN', '-SDP'}
 
     if args.type == 'test':
-        # dataset_index = [1, 3, 6, 7, 8, 12, 14]
-        dataset_index = [3]
-        dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
-        dataset_detection_type = {'-FRCNN'}
+        dataset_index = [1, 3, 6, 7, 8, 12, 14]
+        # dataset_index = [6]
+        # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
+        dataset_detection_type = {'-FRCNN', '-SDP'}
 
     dataset_image_folder_format = os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/img1')
     detection_file_name_format=os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/det/det.txt')
@@ -86,13 +86,13 @@ def test():
                 vw.write(image_org)
 
             # save result
-            # for t in tracker.tracks:
-            #     n = t.nodes[-1]
-            #     if t.age == 1:
-            #         b = n.box
-            #         result.append(
-            #             [i] + [t.id] + [b[0]*w, b[1]*h, b[2]*w, b[3]*h] + [-1, -1, -1, -1]
-            #         )
+            for t in tracker.tracks:
+                n = t.nodes[-1]
+                if t.age == 1:
+                    b = n.get_box(tracker.frame_index-1, tracker.recorder)
+                    result.append(
+                        [i] + [t.id] + [b[0]*w, b[1]*h, b[2]*w, b[3]*h] + [-1, -1, -1, -1]
+                    )
         # save data
         np.savetxt(saved_file_name, np.array(result).astype(int), fmt='%i')
         print(result_str)

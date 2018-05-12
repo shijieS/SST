@@ -54,31 +54,6 @@ config = {
 # add the contraints
 config['final_net']['900'][0] = np.sum(config['selector_channel'])*2
 
-def init_train_mot():
-    config['mot_root'] = '/ssm/ssj/dataset/MOT17'
-    config['base_net_folder'] = '/ssm/ssj/weights/MOT17/vgg16_reducedfc.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/log0326-I50k-M80-G30'
-    config['save_folder'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30'
-    config['type'] = 'train'
-    config['dataset_type'] = 'train'
-    config['resume'] = None
-    config['start_iter'] = 0
-    config['cuda'] = True
-    config['max_gap_frame'] = 20
-    config['min_gap_frame'] = 0
-    config['batch_size'] = 8
-    config['num_workers'] = 16
-    config['iterations'] = 85050
-    config['learning_rate'] = 5e-3
-    config['false_constant'] = 10
-    config['detector'] = 'FRCNN'
-    config['max_object'] = 80
-    config['max_gap_frame'] = 40
-    config['min_gap_frame'] = 0
-    config['min_visibility'] = 0.3
-
-# init_mot_train()
-
 def init_eval():
     '''
     ssm server
@@ -276,15 +251,39 @@ def init_test_mot17():
     '''
     ssm
     '''
-    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30/ssj300_0712_80000.pth'
+    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30-Continue0509v1.pth'
     config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
     config['batch_size'] = 1
     config['write_file'] = True
     config['tensorboard'] = True
     config['save_combine'] = False
-    config['type'] = 'test'
+    config['type'] = 'train'
 
 init_test_mot17()
+
+
+def init_train_mot17():
+    config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
+    config['base_net_folder'] = '/home/ssm/ssj/weights/MOT17/vgg16_reducedfc.pth'
+    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/log0326-I50k-M80-G30-Continue0509'
+    config['save_folder'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30-Continue0509'
+    config['type'] = 'train'
+    config['dataset_type'] = 'train'
+    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30/ssj300_0712_80000.pth' #None
+    config['start_iter'] = 80000
+    config['cuda'] = True
+    config['batch_size'] = 8
+    config['num_workers'] = 16
+    config['iterations'] = 100050
+    config['learning_rate'] = 1e-2
+    config['false_constant'] = 10
+    config['detector'] = 'FRCNN'
+    config['max_object'] = 80
+    config['max_gap_frame'] = 30
+    config['min_gap_frame'] = 0
+    config['min_visibility'] = 0.3
+
+# init_train_mot17()
 
 '''
 train kitti dataset
