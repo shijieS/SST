@@ -61,13 +61,13 @@ class TrackUtil:
                 delta_h = min(b1[2], b2[2]) - max(b1[0], b2[0])
                 delta_w = min(b1[3], b2[3])-max(b1[1], b2[1])
                 if delta_h < 0 or delta_w < 0:
-                    overlap = -abs(delta_h * delta_w)
+                    expand_area = (max(b1[2], b2[2]) - min(b1[0], b2[0])) * (max(b1[3], b2[3]) - min(b1[1], b2[1]))
+                    area = (b1[2] - b1[0]) * (b1[3] - b1[1]) + (b2[2] - b2[0]) * (b2[3] - b2[1])
+                    iou[i,j] = -(expand_area - area) / area
                 else:
                     overlap = delta_h * delta_w
-
-                # overlap = max(min(b1[2], b2[2]) - max(b1[0], b2[0]), 0) * max(min(b1[3], b2[3])-max(b1[1], b2[1]), 0)
-                area = (b1[2]-b1[0])*(b1[3]-b1[1]) + (b2[2]-b2[0])*(b2[3]-b2[1]) - max(overlap, 0)
-                iou[i,j] = overlap / area
+                    area = (b1[2]-b1[0])*(b1[3]-b1[1]) + (b2[2]-b2[0])*(b2[3]-b2[1]) - max(overlap, 0)
+                    iou[i,j] = overlap / area
 
         return iou
 
@@ -105,10 +105,10 @@ class TrackUtil:
 
 class TrackerConfig:
 
-    max_record_frame = 20
-    max_track_age = 20
-    max_track_node = 20
-    max_draw_track_node = 20
+    max_record_frame = 30
+    max_track_age = 30
+    max_track_node = 30
+    max_draw_track_node = 30
 
     max_object = config['max_object']
     sst_model_path = config['resume']
@@ -116,8 +116,8 @@ class TrackerConfig:
     mean_pixel = config['mean_pixel']
     image_size = (config['sst_dim'], config['sst_dim'])
 
-    min_iou_frame_gap = [1, 2, 3, 4, 5, 6]
-    min_iou = [0.05, 0.0, -0.5, -1.0, -1.5, -2.0]
+    min_iou_frame_gap = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    min_iou = [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0]
     # min_iou = [pow(0.3, i) for i in min_iou_frame_gap]
 
     min_merge_threshold = 0.1
@@ -280,9 +280,19 @@ class Track:
     def reset_age(self):
         self.age = 0
 
-    def add_node(self, node):
+    def add_node(self, frame_index, recorder, node):
+        # iou judge
+        if len(self.nodes) > 0:
+            n = self.nodes[-1]
+            iou = n.get_iou(frame_index, recorder, node.id)
+            delta_frame = frame_index - n.frame_index
+            if delta_frame in TrackerConfig.min_iou_frame_gap:
+                iou_index = TrackerConfig.min_iou_frame_gap.index(delta_frame)
+                if iou < TrackerConfig.min_iou[iou_index]:
+                    return False
         self.nodes.append(node)
         self.reset_age()
+        return True
 
     def get_similarity(self, frame_index, recorder):
 
@@ -377,7 +387,7 @@ class Tracks:
 
         # draw rectangle
         for t in self.tracks:
-            if len(t.nodes) > 0 and t.age<2:
+            if len(t.nodes) > 0 and t.age < 2:
                 b = t.nodes[-1].get_box(frame_index, recorder)
                 if b is None:
                     continue
@@ -428,31 +438,6 @@ class SSTTracker:
             self.sst.load_state_dict(torch.load(config['resume'], map_location='cpu'))
         self.sst.eval()
 
-    def iou(self, bb_test, bb_gt):
-        """
-        Computes IUO between two bboxes in the form [x1,y1,x2,y2]
-        """
-        xx1 = np.maximum(bb_test[0], bb_gt[0])
-        yy1 = np.maximum(bb_test[1], bb_gt[1])
-        xx2 = np.minimum(bb_test[2], bb_gt[2])
-        yy2 = np.minimum(bb_test[3], bb_gt[3])
-        w = np.maximum(0., xx2 - xx1)
-        h = np.maximum(0., yy2 - yy1)
-        wh = w * h
-        o = wh / ((bb_test[2] - bb_test[0]) * (bb_test[3] - bb_test[1])
-                  + (bb_gt[2] - bb_gt[0]) * (bb_gt[3] - bb_gt[1]) - wh)
-        return (o)
-
-    def custom_iou(self, bb_test, bb_gt):
-        xx1 = np.minimum(bb_test[0], bb_gt[0])
-        yy1 = np.minimum(bb_test[1], bb_gt[1])
-        xx2 = np.maximum(bb_test[2], bb_gt[2])
-        yy2 = np.maximum(bb_test[3], bb_gt[3])
-        w = xx2 - xx1
-        h = yy2 - yy1
-        return ((bb_test[2] - bb_test[0]) * (bb_test[3] - bb_test[1])
-                  + (bb_gt[2] - bb_gt[0]) * (bb_gt[3] - bb_gt[1]))/w*h
-
     def update(self, image, detection, show_image):
         '''
         Update the state of tracker, the following jobs should be done:
@@ -482,7 +467,7 @@ class SSTTracker:
             for i in range(detection.shape[1]):
                 t = Track()
                 n = Node(self.frame_index, i)
-                t.add_node(n)
+                t.add_node(self.frame_index, self.recorder, n)
                 self.tracks.append(t)
             self.tracks.one_frame_pass()
             self.frame_index += 1
@@ -518,9 +503,6 @@ class SSTTracker:
 
         print(verify_iteration)
 
-
-
-
         #4) update the tracks
         for i in row_index:
             track_id = ids[i]
@@ -529,14 +511,14 @@ class SSTTracker:
             if col_id < 0:
                 continue
             node = Node(self.frame_index, col_id)
-            t.add_node(node)
+            t.add_node(self.frame_index, self.recorder, node)
 
         #5) add new track
         for col in range(len(detection_org)):
             if col not in col_index:
                 node = Node(self.frame_index, col)
                 t = Track()
-                t.add_node(node)
+                t.add_node(self.frame_index, self.recorder, node)
                 self.tracks.append(t)
 
         # remove the old track

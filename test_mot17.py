@@ -21,9 +21,10 @@ args = parser.parse_args()
 def test():
     if args.type == 'train':
         dataset_index = [2, 4, 5, 9, 10, 11, 13]
-        # dataset_index = [10]
-        dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
-        dataset_detection_type = {'-FRCNN', '-SDP'}
+        # dataset_index = [2]
+        # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
+        # dataset_detection_type = {'-FRCNN', '-SDP'}
+        dataset_detection_type = {'-FRCNN'}
 
     if args.type == 'test':
         dataset_index = [1, 3, 6, 7, 8, 12, 14]
