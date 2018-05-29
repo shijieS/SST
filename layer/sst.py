@@ -25,7 +25,7 @@ import os
 
 class SST(nn.Module):
     #new: combine two vgg_net
-    def __init__(self, phase, base, extras, selector, final_net):
+    def __init__(self, phase, base, extras, selector, final_net, use_gpu=config['cuda']):
         super(SST, self).__init__()
         self.phase = phase
 
@@ -49,7 +49,7 @@ class SST(nn.Module):
         self.false_objects_column = None
         self.false_objects_row = None
         self.false_constant = config['false_constant']
-        self.use_gpu = config['cuda']
+        self.use_gpu = use_gpu
 
     def forward(self, x_pre, x_next, l_pre , l_next, valid_pre=None, valid_next=None):
         '''
@@ -101,14 +101,14 @@ class SST(nn.Module):
         s = list()
 
         x = self.forward_vgg(x, self.vgg, s)
-        x = self.forward_extras(x, self.extras,s)
+        x = self.forward_extras(x, self.extras, s)
         x = self.forward_selector_stacker1(s, l, self.selector)
 
         return x
 
     def get_similarity(self, image1, detection1, image2, detection2):
         feature1 = self.forward_feature_extracter(image1, detection1)
-        feature2 = self.forward(image2, detection2)
+        feature2 = self.forward_feature_extracter(image2, detection2)
         return self.forward_stacker_features(feature1, feature2, False)
 
 
@@ -360,7 +360,7 @@ def selector(vgg, extra_layers, batch_normal=True):
 
     return vgg, extra_layers, selector_layers
 
-def build_sst(phase, size=900):
+def build_sst(phase, size=900, use_gpu=config['cuda']):
     '''
     create the SSJ Tracker Object
     :return: ssj tracker object
@@ -382,5 +382,6 @@ def build_sst(phase, size=900):
                    vgg(base[str(size)], 3),
                    add_extras(extras[str(size)], 1024)
                ),
-               add_final(final[str(size)])
+               add_final(final[str(size)]),
+               use_gpu
                )
