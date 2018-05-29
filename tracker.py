@@ -72,36 +72,83 @@ class TrackUtil:
         return iou
 
     @staticmethod
-    def get_merge_value(t1, t2):
-        merge_value = 0
-        if t1 is t2:
-            return merge_value
+    def get_node_similarity(n1, n2, frame_index, recorder):
+        if n1.frame_index > n2.frame_index:
+            n_max = n1
+            n_min = n2
+        elif n1.frame_index < n2.frame_index:
+            n_max = n2
+            n_min = n1
+        else: # in the same frame_index
+            return None
 
-        for i, f1 in enumerate(t1.f):
-            for j, f2 in enumerate(t2.f):
-                if f1 == f2 and t1.uv[i, i] == t2.uv[j, j] and t1.uv[i, i] != -1:
-                    merge_value += 1
-        return merge_value / float(TrackerConfig.max_track_node)
+        f_max = n_max.frame_index
+        f_min = n_min.frame_index
+
+        # not recorded in recorder
+        if frame_index - f_min >= TrackerConfig.max_track_node:
+            return None
+
+        return recorder.all_similarity[f_max][f_min][n_min.id, n_max.id]
+
+    @staticmethod
+    def get_merge_similarity(t1, t2, frame_index, recorder):
+        '''
+        Get the similarity between two tracks
+        :param t1: track 1
+        :param t2: track 2
+        :param frame_index: current frame_index
+        :param recorder: recorder
+        :return: the similairty (float value). if valid, return None
+        '''
+        merge_value = []
+        if t1 is t2:
+            return None
+
+        all_f1 = [n.frame_index for n in t1.nodes]
+        all_f2 = [n.frame_index for n in t2.nodes]
+
+        for i, f1 in enumerate(all_f1):
+            for j, f2 in enumerate(all_f2):
+                compare_f = [f1 + 1, f1 - 1]
+                for f in compare_f:
+                    if f not in all_f1 and f == f2:
+                        n1 = t1.nodes[i]
+                        n2 = t2.nodes[j]
+                        s = TrackUtil.get_node_similarity(n1, n2, frame_index, recorder)
+                        if s is None:
+                            continue
+                        merge_value += [s]
+
+        if len(merge_value) == 0:
+            return None
+        return np.mean(np.array(merge_value))
 
     @staticmethod
     def merge(t1, t2):
-        # keep the track with the highest matching probability.
-        # remove the overlapped node of the bad one
-        s1 = t1.get_total_similarity()
-        s2 = t2.get_total_similarity()
+        '''
+        merge t2 to t1, after that t2 is set invalid
+        :param t1: track 1
+        :param t2: track 2
+        :return: None
+        '''
+        all_f1 = [n.frame_index for n in t1.nodes]
+        all_f2 = [n.frame_index for n in t2.nodes]
 
-        is_t1 = False
-        if s1 == 0 and s2 == 0:
-            if t1.id > t2.id:
-                is_t1 = True
-        else:
-            if s1 < s2:
-                is_t1 = True
+        for i, f2 in enumerate(all_f2):
+            if f2 not in all_f1:
+                insert_pos = 0
+                for j, f1 in enumerate(all_f1):
+                    if f2 < f1:
+                        break
+                    insert_pos += 1
+                t1.nodes.insert(insert_pos, t2.nodes[i])
 
-        if is_t1:
-            t1.remove_similarity_node(t2)
-        else:
-            t2.remove_similarity_node(t1)
+        # remove some nodes in t1 in order to keep t1 satisfy the max nodes
+        if len(t1.nodes) > TrackerConfig.max_track_node:
+            t1.nodes = t1.nodes[-TrackerConfig.max_track_node:]
+        t1.age = min(t1.age, t2.age)
+        t2.valid = False
 
 class TrackerConfig:
 
@@ -117,17 +164,68 @@ class TrackerConfig:
     image_size = (config['sst_dim'], config['sst_dim'])
 
     min_iou_frame_gap = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    min_iou = [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0]
+    min_iou = [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0]
     # min_iou = [pow(0.3, i) for i in min_iou_frame_gap]
 
-    min_merge_threshold = 0.1
+    min_merge_threshold = 0.9
 
     max_bad_node = 0.9
 
-    decay = 1
+    decay = 0.93
 
-    roi_verify_max_iteration = 3
-    roi_verify_punish_rate = 0.2
+    roi_verify_max_iteration = 2
+    roi_verify_punish_rate = 0.6
+
+    @staticmethod
+    def set_configure(all_choice):
+        min_iou_frame_gaps = [
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            ]
+        min_ious = [
+            [0.3, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0],
+            [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
+            [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
+            [0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
+            [0.0, 0.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0, -7.0],
+        ]
+
+        decays = [1-0.01*i for i in range(11)]
+
+        roi_verify_max_iterations = [2, 3, 4, 5, 6]
+
+        roi_verify_punish_rates = [0.6, 0.4, 0.2, 0.1, 0.0]
+
+        max_track_ages = [i*6 for i in range(1,6)]
+        max_track_nodes = [i*3 for i in range(1,11)]
+
+        TrackerConfig.min_iou_frame_gap = min_iou_frame_gaps[all_choice[0]]
+        TrackerConfig.min_iou = min_ious[all_choice[0]]
+        TrackerConfig.decay = decays[all_choice[1]]
+        TrackerConfig.roi_verify_max_iteration = roi_verify_max_iterations[all_choice[2]]
+        TrackerConfig.roi_verify_punish_rate = roi_verify_punish_rates[all_choice[3]]
+        TrackerConfig.max_track_age = max_track_ages[all_choice[4]]
+        TrackerConfig.max_track_node = max_track_nodes[all_choice[5]]
+
+    @staticmethod
+    def get_configure_str(all_choice):
+        return "{}_{}_{}_{}_{}_{}".format(all_choice[0], all_choice[1], all_choice[2], all_choice[3], all_choice[4], all_choice[5])
+
+    @staticmethod
+    def get_all_choices():
+        # return [(1, 1, 0, 0, 4, 2)]
+        return [(i1, i2, i3, i4, i5, i6) for i1 in range(5) for i2 in range(5) for i3 in range(5) for i4 in range(5) for i5 in range(5) for i6 in range(5)]
+
+    @staticmethod
+    def get_all_choices_decay():
+        return [(1, i2, 0, 0, 4, 2) for i2 in range(11)]
+
+    @staticmethod
+    def get_all_choices_max_track_node():
+        return [(1, 7, 0, 0, 4, i6) for i6 in range(10)]
 
 class FeatureRecorder:
     '''
@@ -161,7 +259,7 @@ class FeatureRecorder:
 
             self.all_similarity[frame_index] = {}
             for pre_index in self.all_frame_index[:-1]:
-                delta = pow(TrackerConfig.decay, frame_index - pre_index)
+                delta = pow(TrackerConfig.decay, (frame_index - pre_index)/3.0)
                 pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), Variable(features), fill_up_column=False)
                 self.all_similarity[frame_index][pre_index] = pre_similarity*delta
 
@@ -268,6 +366,7 @@ class Track:
         self.id = Track._id_pool
         Track._id_pool += 1
         self.age = 0
+        self.valid = True   # indicate this track is merged
         self.color = tuple((np.random.rand(3) * 255).astype(int).tolist())
 
     def __del__(self):
@@ -295,7 +394,6 @@ class Track:
         return True
 
     def get_similarity(self, frame_index, recorder):
-
         similarity = []
         for n in self.nodes:
             f = n.frame_index
@@ -307,7 +405,7 @@ class Track:
         if len(similarity) == 0:
             return None
         a = np.array(similarity)
-        return np.mean(np.array(similarity), axis=0)
+        return np.sum(np.array(similarity), axis=0)
 
     def verify(self, frame_index, recorder, box_id):
         for n in self.nodes:
@@ -332,6 +430,7 @@ class Tracks:
     def __init__(self):
         self.tracks = list() # the set of tracks
         self.max_drawing_track = TrackerConfig.max_draw_track_node
+
 
     def __getitem__(self, item):
         return self.tracks[item]
@@ -381,6 +480,36 @@ class Tracks:
 
         self.tracks = [self.tracks[i] for i in keep_track_set]
 
+    def merge(self, frame_index, recorder):
+        t_l = len(self.tracks)
+        res = np.zeros((t_l, t_l), dtype=float)
+        # get track similarity matrix
+        for i, t1 in enumerate(self.tracks):
+            for j, t2 in enumerate(self.tracks):
+                s = TrackUtil.get_merge_similarity(t1, t2, frame_index, recorder)
+                if s is None:
+                    res[i, j] = 0
+                else:
+                    res[i, j] = s
+
+        # get the track pair which needs merged
+        used_indexes = []
+        merge_pair = []
+        for i, t1 in enumerate(self.tracks):
+            if i in used_indexes:
+                continue
+            max_track_index = np.argmax(res[i, :])
+            if i != max_track_index and res[i, max_track_index] > TrackerConfig.min_merge_threshold:
+                used_indexes += [max_track_index]
+                merge_pair += [(i, max_track_index)]
+
+        # start merge
+        for i, j in merge_pair:
+            TrackUtil.merge(self.tracks[i], self.tracks[j])
+
+        # remove the invalid tracks
+        self.tracks = [t for t in self.tracks if t.valid]
+
 
     def show(self, frame_index, recorder, image):
         h, w, _ = image.shape
@@ -416,6 +545,7 @@ class Tracks:
 # The tracker is compatible with pytorch (cuda)
 class SSTTracker:
     def __init__(self):
+        Track._id_pool = 1
         self.first_run = True
         self.image_size = TrackerConfig.image_size
         self.model_path = TrackerConfig.sst_model_path
@@ -523,6 +653,10 @@ class SSTTracker:
 
         # remove the old track
         self.tracks.one_frame_pass()
+
+        # merge the tracks
+        # if self.frame_index % 20 == 0:
+        #     self.tracks.merge(self.frame_index, self.recorder)
 
         if show_image:
             image_org = self.tracks.show(self.frame_index, self.recorder, image_org)

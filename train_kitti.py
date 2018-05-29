@@ -53,7 +53,7 @@ weight_decay = args.weight_decay
 
 # stepvalues = (40000, 50000)
 # stepvalues = (105000, 115000)
-stepvalues = (0, 140050)
+stepvalues = (1000, 20000)
 # stepvalues = (50000, 60000)
 # stepvalues = (85000, 100000)
 gamma = args.gamma
@@ -140,7 +140,7 @@ def train():
             step_index += 1
             current_lr = adjust_learning_rate(optimizer, args.gamma, step_index)
 
-            if args.tensorboard:
+            if args.tensorboard and iteration != 0:
                 writer.add_scalar('data/epoch_loss', loss.data.cpu()/epoch_size, iteration)
                 writer.add_scalar('data/learning_rate', current_lr, iteration)
                 # reset epoch loss counters

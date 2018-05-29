@@ -7,6 +7,8 @@ import torch.nn.init as init
 import argparse
 from torch.autograd import Variable
 import torch.utils.data as data
+import numpy as np
+import cv2
 from data.mot import MOTTrainDataset
 from config.config import config
 from layer.sst import build_sst
@@ -43,14 +45,22 @@ args = parser.parse_args()
 if not os.path.exists(args.save_folder):
     os.mkdir(args.save_folder)
 
+if 'save_images_folder' in config and not os.path.exists(config['save_images_folder']):
+    os.mkdir(config['save_images_folder'])
+
 sst_dim = config['sst_dim']
 means = config['mean_pixel']
 batch_size = args.batch_size
 max_iter = args.iterations
 weight_decay = args.weight_decay
 
-# stepvalues = (35000, 45000, 50000)
-stepvalues = (90000, 95000)
+if 'learning_rate_decay_by_epoch' in config:
+    stepvalues = list((config['epoch_size'] * i for i in config['learning_rate_decay_by_epoch']))
+    save_weights_iteration = config['save_weight_every_epoch_num'] * config['epoch_size']
+else:
+    stepvalues = (90000, 95000)
+    save_weights_iteration = 5000
+
 gamma = args.gamma
 momentum = args.momentum
 
@@ -105,8 +115,7 @@ criterion = SSTLoss(args.cuda)
 
 def train():
     net.train()
-
-    epoch = 0
+    current_lr = config['learning_rate']
     print('Loading Dataset...')
 
     dataset = MOTTrainDataset(args.mot_root,
@@ -131,19 +140,13 @@ def train():
         if (not batch_iterator) or (iteration % epoch_size == 0):
             # create batch iterator
             batch_iterator = iter(data_loader)
-
+            all_epoch_loss = []
 
         if iteration in stepvalues:
             step_index += 1
             current_lr = adjust_learning_rate(optimizer, args.gamma, step_index)
 
-            if args.tensorboard:
-                writer.add_scalar('data/epoch_loss', loss.data.cpu()/epoch_size, iteration)
-                writer.add_scalar('data/learning_rate', current_lr, iteration)
-                # reset epoch loss counters
-            epoch += 1
-
-        # load trian data
+        # load train data
         img_pre, img_next, boxes_pre, boxes_next, labels, valid_pre, valid_next=\
             next(batch_iterator)
 
@@ -177,13 +180,17 @@ def train():
         optimizer.step()
         t1 = time.time()
 
+        all_epoch_loss += [loss.data.cpu()]
+
         if iteration % 10 == 0:
             print('Timer: %.4f sec.' % (t1 - t0))
             print('iter ' + repr(iteration) + ', ' + repr(epoch_size) + ' || epoch: %.4f ' % (iteration/(float)(epoch_size)) + ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
 
         if args.tensorboard:
-            # add scalar
-            # if iteration % 20 == 0:
+            if len(all_epoch_loss) > 30:
+                writer.add_scalar('data/epoch_loss', float(np.mean(all_epoch_loss)), iteration)
+            writer.add_scalar('data/learning_rate', current_lr, iteration)
+
             writer.add_scalar('loss/loss', loss.data.cpu(), iteration)
             writer.add_scalar('loss/loss_pre', loss_pre.data.cpu(), iteration)
             writer.add_scalar('loss/loss_next', loss_next.data.cpu(), iteration)
@@ -200,19 +207,11 @@ def train():
 
             # add images
             if args.send_images and iteration % 1000 == 0:
-                # add images
-                # writer.add_image('WithoutLabel/Image_pre',
-                #                  vutils.make_grid(img_pre.data, nrow=2, normalize=True, scale_each=True),iteration)
-                # writer.add_image('WithoutLabel/Image_next',
-                #                  vutils.make_grid(img_next.data, nrow=2, normalize=True, scale_each=True), iteration)
-                # writer.add_image('WithLabel/Image_pre',
-                #                  vutils.make_grid(show_circle(img_pre, boxes_pre, valid_pre), nrow=2, normalize=True, scale_each=True), iteration)
-                # writer.add_image('WithLabel/Image_next',
-                #                  vutils.make_grid(show_circle(img_next, boxes_next, valid_next), nrow=2, normalize=True, scale_each=True), iteration)
-                result_image = show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next, predict_indexes)
+                result_image = show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next, predict_indexes, iteration)
+
                 writer.add_image('WithLabel/ImageResult', vutils.make_grid(result_image, nrow=2, normalize=True, scale_each=True), iteration)
 
-        if iteration % 5000 == 0:
+        if iteration % save_weights_iteration == 0:
             print('Saving state, iter:', iteration)
             torch.save(sst_net.state_dict(),
                        os.path.join(

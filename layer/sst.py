@@ -64,7 +64,6 @@ class SST(nn.Module):
         '''
         sources_pre = list()
         sources_next = list()
-
         x_pre = self.forward_vgg(x_pre, self.vgg, sources_pre)
         x_next = self.forward_vgg(x_next, self.vgg, sources_next)
         # x_next.register_hook(lambda grad: print('start:', grad.sum().data[0]))
@@ -106,6 +105,12 @@ class SST(nn.Module):
         x = self.forward_selector_stacker1(s, l, self.selector)
 
         return x
+
+    def get_similarity(self, image1, detection1, image2, detection2):
+        feature1 = self.forward_feature_extracter(image1, detection1)
+        feature2 = self.forward(image2, detection2)
+        return self.forward_stacker_features(feature1, feature2, False)
+
 
     def resize_dim(self, x, added_size, dim=1, constant=0):
         if added_size <= 0:
@@ -184,8 +189,8 @@ class SST(nn.Module):
 
     def forward_extras(self, x, extras, sources):
         for k, v in enumerate(extras):
-            x = F.relu(v(x), inplace=True)
-            if k % 6 == 3:
+            x = v(x) #x = F.relu(v(x), inplace=True)        #done: relu is unnecessary.
+            if k % 6 == 3:                  #done: should select the output of BatchNormalization (-> k%6==2)
                 sources.append(x)
         return x
 

@@ -3,7 +3,6 @@ import os.path
 import sys
 import torch
 import torch.utils.data as data
-import torchvision.transforms as transforms
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np

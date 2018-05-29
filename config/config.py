@@ -1,6 +1,11 @@
 import numpy as np
 import json
 
+configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
+                   'init_train_kitti', 'init_test_kitti', 'exp_train_mot17_final_net']
+
+current_select_configure = 'exp_train_mot17_final_net'
+
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
     'save_folder': '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30',
@@ -41,7 +46,7 @@ config = {
     'selector_size': (255, 113, 56, 28, 14, 12, 10, 5, 3),
     'selector_channel':(60, 80, 100, 80, 60, 50, 40, 30, 20),
     'final_net' : {
-        '900': [400, 512, 256, 128, 64, 1],
+        '900': [1040, 512, 256, 128, 64, 1],
         '1024': []
     },
     'vgg_source' : [15, 25, -1],
@@ -54,181 +59,7 @@ config = {
 # add the contraints
 config['final_net']['900'][0] = np.sum(config['selector_channel'])*2
 
-def init_eval():
-    '''
-    ssm server
-
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0303-Formal-B8-M2-F10-I14k/ssj300_0712_5000.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/eval0302-Formal-B8-M30-F10-I40k-5000'
-    config['batch_size'] = 1
-    config['cuda'] = True
-    config['num_workers'] = 8
-    config['start_iter'] = 0
-    config['iterations'] = 19000
-    '''
-
-    '''
-    OpenStack Server
-    '''
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config['resume'] = '/ssm/ssj/weights/MOT17/weights0303-Formal-B8-M2-F10-I20k-5000/ssj300_0712_5000.pth'
-    config['mot_root'] = '/ssm/ssj/dataset/MOT17'
-    config['cuda'] = False
-    config['log_folder'] = '/ssm/ssj/weights/MOT17/eval0303-Formal-B8-M2-F10-I20k-5000'
-    config['max_gap_frame'] = 20
-    config['min_gap_frame'] = 1
-    config['batch_size'] = 1
-    config['num_workers'] = 8
-    config['start_iter'] = 0
-    config['iterations'] = 20000
-    config['write_csv'] = False
-
-    '''
-    local server
-    args.trained_model = r'F:\PeopleCounting\weights\MOT17\sst300_0712_20000.pth'
-    args.save_folder = r'F:\PeopleCounting\weights\MOT17\eval0223'
-    args.mot_root = r'F:\PeopleCounting\dataset\MOT\17\MOT17'
-    config['cuda'] = False
-    '''
-
-
-def init_test():
-    '''
-    ssm server
-    '''
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0303-Formal-FixedClone-B8-M2-F10-I20k/ssj300_0712_15000.pth'
-    config['mot_root'] = '/ssm/ssj/dataset/MOT17'
-    config['cuda'] = True
-    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/test0303-Formal-FixedClone-B8-M2-F10-I20k-15000'
-    config['max_gap_frame'] = 1
-    config['min_gap_frame'] = 1
-    config['batch_size'] = 1
-    config['num_workers'] = 8
-    config['start_iter'] = 0
-    config['write_csv'] = True
-    config['tensorboard'] = False
-
-    '''
-    OpenStack Server
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config['resume'] = '/ssm/ssj/weights/MOT17/weights0303-Formal-FixedClone-B8-M2-F10-I20k/ssj300_0712_15000.pth'
-    config['mot_root'] = '/ssm/ssj/dataset/MOT17'
-    config['cuda'] = False
-    config['log_folder'] = '/ssm/ssj/weights/MOT17/debug0303-Formal-FixedClone-B8-M2-F10-I20k-15000'
-    config['max_gap_frame'] = 1
-    config['min_gap_frame'] = 1
-    config['batch_size'] = 1
-    config['num_workers'] = 8
-    config['start_iter'] = 0
-    config['write_csv'] = True
-    config['tensorboard'] = False
-    '''
-
-    '''
-    local server
-    args.trained_model = r'F:\PeopleCounting\weights\MOT17\sst300_0712_20000.pth'
-    args.save_folder = r'F:\PeopleCounting\weights\MOT17\eval0223'
-    args.mot_root = r'F:\PeopleCounting\dataset\MOT\17\MOT17'
-    config['cuda'] = False
-    '''
-
-
-def init_mot_metric():
-    '''
-    ssm server
-    '''
-    config['type'] = 'test'
-    config['dataset_type'] = 'train'
-    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0303-Formal-FixedClone-B8-M2-F10-I20k/ssj300_0712_15000.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/mot_metric0303-Formal-FixedClone-B8-M2-F10-I20k-15000'
-    config['min_visibility'] = 0.3
-    config['batch_size'] = 1
-    config['start_iter'] = 0
-    config['max_gap_frame'] = 1
-    config['min_gap_frame'] = 1
-    config['write_file'] = True
-    config['tensorboard'] = True
-    config['save_combine'] = False
-    config['origin_image_height'] = 1080
-    config['origin_image_width'] = 1920
-
-    '''
-    OpenStack Server
-
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config['resume'] = '/ssm/ssj/weights/MOT17/weights0303-Formal-FixedClone-B8-M2-F10-I20k/ssj300_0712_15000.pth'
-    config['mot_root'] = '/ssm/ssj/dataset/MOT17'
-    config['cuda'] = False
-    config['log_folder'] = '/ssm/ssj/weights/MOT17/mot_metric0303-Formal-FixedClone-B8-M2-F10-I20k-15000'
-    config['max_gap_frame'] = 1
-    config['min_gap_frame'] = 1
-    config['batch_size'] = 1
-    config['num_workers'] = 1
-    config['start_iter'] = 0
-    config['write_file'] = True
-    config['tensorboard'] = False
-    '''
-    '''
-    local server
-    args.trained_model = r'F:\PeopleCounting\weights\MOT17\sst300_0712_20000.pth'
-    args.save_folder = r'F:\PeopleCounting\weights\MOT17\eval0223'
-    args.mot_root = r'F:\PeopleCounting\dataset\MOT\17\MOT17'
-    config['cuda'] = False
-    '''
-
-
-def init_tracker_config():
-    '''
-    ssm server
-    '''
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config[
-        'resume'] = '/home/ssm/ssj/weights/MOT17/weights0303-Formal-FixedClone-B8-M1-20-F10-I20k-Continue/ssj300_0712_20000.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/mot_metric0303-Formal-FixedClone-B8-M2-F10-I20k-15000'
-    config['min_visibility'] = 0.3
-    config['batch_size'] = 1
-    config['start_iter'] = 0
-    config['max_gap_frame'] = 1
-    config['min_gap_frame'] = 1
-    config['write_file'] = True
-    config['tensorboard'] = True
-    config['save_combine'] = False
-    config['origin_image_height'] = 1080
-    config['origin_image_width'] = 1920
-
-    '''
-    OpenStack Server
-
-    config['type'] = 'test'
-    config['dataset_type'] = 'test'
-    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0303-Formal-FixedClone-B8-M10-20-F10-I20k/ssj300_0712_15000.pth'
-    config['mot_root'] = '/ssm/ssj/dataset/MOT17'
-    config['cuda'] = False
-    config['log_folder'] = '/ssm/ssj/weights/MOT17/mot_metric0303-Formal-FixedClone-B8-M2-F10-I20k-15000'
-    config['max_gap_frame'] = 1
-    config['min_gap_frame'] = 1
-    config['batch_size'] = 1
-    config['num_workers'] = 1
-    config['start_iter'] = 0
-    config['write_file'] = True
-    config['tensorboard'] = False
-    '''
-    '''
-    local server
-    args.trained_model = r'F:\PeopleCounting\weights\MOT17\sst300_0712_20000.pth'
-    args.save_folder = r'F:\PeopleCounting\weights\MOT17\eval0223'
-    args.mot_root = r'F:\PeopleCounting\dataset\MOT\17\MOT17'
-    config['cuda'] = False
-    '''
-
+all_functions = []
 '''
 test mot train dataset
 '''
@@ -244,8 +75,7 @@ def init_test_mot16():
     config['save_combine'] = False
     config['type'] = 'test'
 
-# init_test_mot16()
-
+all_functions += [init_test_mot16]
 
 def init_test_mot17():
     '''
@@ -259,8 +89,7 @@ def init_test_mot17():
     config['save_combine'] = False
     config['type'] = 'train'
 
-init_test_mot17()
-
+all_functions += [init_test_mot17]
 
 def init_train_mot17():
     config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
@@ -284,31 +113,59 @@ def init_train_mot17():
     config['min_visibility'] = 0.3
 
 # init_train_mot17()
+all_functions += [init_train_mot17]
 
-'''
-train kitti dataset
-'''
+def exp_train_mot17_final_net():
+    config['epoch_size'] = 664
+    config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
+    config['base_net_folder'] = '/home/ssm/ssj/weights/MOT17/vgg16_reducedfc.pth'
+    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/0528-E120-M80-G30-log'
+    config['save_folder'] = '/home/ssm/ssj/weights/MOT17/0528-E120-M80-G30-weights'
+    config['save_images_folder'] = '/home/ssm/ssj/weights/MOT17/0528-E120-M80-G30-images'
+    config['type'] = 'train'
+    config['dataset_type'] = 'train'
+    config['resume'] = None
+    config['detector'] = 'FRCNN'
+    config['start_iter'] = 0
+    config['iteration_epoch_num'] =  120
+    config['iterations'] = config['start_iter'] + config['epoch_size']*config['iteration_epoch_num'] + 50
+    config['batch_size'] = 8
+    config['learning_rate'] = 1e-2
+    config['learning_rate_decay_by_epoch'] = (50, 80, 100, 110)
+    config['save_weight_every_epoch_num'] = 5
+    config['min_gap_frame'] = 0
+    config['max_gap_frame'] = 30
+    config['false_constant'] = 10
+    config['num_workers'] = 16
+    config['cuda'] = True
+    config['max_object'] = 80
+    config['min_visibility'] = 0.3
+    config['final_net']['900'] = [int(config['final_net']['900'][0]), 1]
+
+all_functions += [exp_train_mot17_final_net]
+
 def init_train_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
     config['kitti_detection_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/tracking_label_2'
     config['base_net_folder'] = '/home/ssm/ssj/weights/KITTI/vgg16_reducedfc.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/KITTI/log0406-I60k-M80-G5-C10-All-Continue'
-    config['save_folder'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue'
+    config['log_folder'] = '/home/ssm/ssj/weights/KITTI/log0518-I60k-M80-G30-C10-Pedestrian-Resume'
+    config['save_folder'] = '/home/ssm/ssj/weights/KITTI/weights0518-I60k-M80-G30-C10-Pedestrian-Resume'
     config['type'] = 'train'
     config['dataset_type'] = 'training'
     config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_140000.pth' #None
-    config['start_iter'] = 130050
+    config['start_iter'] = 0
     config['cuda'] = True
     config['min_gap_frame'] = 0
     config['batch_size'] = 8
     config['num_workers'] = 16
-    config['iterations'] = 140050
-    config['learning_rate'] = 1e-4
+    config['iterations'] = 30050
+    config['learning_rate'] = 1e-2
     config['false_constant'] = 10
     config['max_object'] = 80
-    config['max_gap_frame'] = 5
+    config['max_gap_frame'] = 30
     config['min_gap_frame'] = 0
-# init_train_kitti()
+
+all_functions += [init_train_kitti]
 
 def init_test_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
@@ -321,4 +178,12 @@ def init_test_kitti():
     config['false_constant'] = 10
     config['max_object'] = 80
 
-# init_test_kitti()
+all_functions += [init_test_kitti]
+
+
+for f in all_functions:
+    if f.__name__ == current_select_configure:
+        f()
+        break
+
+print('use configure: ', current_select_configure)

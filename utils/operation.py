@@ -5,6 +5,7 @@ import torch.nn as nn
 import numpy as np
 import cv2
 import torch
+import os
 
 
 def get_equality_matrix(a, b):
@@ -227,7 +228,7 @@ def show_matching_rectangle(img_pre, img_next, boxes_pre, boxes_next, labels, sh
     return img
 
 
-def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next, indexes):
+def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next, indexes, iteration=-1):
     batch_size = img_pre.shape[0]
     images = list()
     h = config['sst_dim']
@@ -273,6 +274,9 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
             img = cv2.circle(img, start_pt, 20, color, thickness=3)
             img = cv2.circle(img, end_pt, 20, color, thickness=3)
             img = cv2.line(img, start_pt, end_pt, color, thickness=3)
+
+        if 'save_images_folder' in config and iteration!=-1:
+            cv2.imwrite(os.path.join(config['save_images_folder'], '{0:06}.png'.format(iteration)), img)
 
         img = torch.from_numpy(img.astype(np.float) - config['mean_pixel']).permute(2, 0, 1)
         images.append(img)

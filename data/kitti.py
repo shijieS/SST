@@ -84,10 +84,18 @@ class GTSingleParser:
         self.detection = pd.read_csv(self.detection_file_name, sep=' ', header=None, dtype=datatype)
 
         self.detection = self.detection.iloc[:, 0:17]
-        select_type_row = [t in ('Van', 'Car', 'Pedestrian', 'Tram', 'Cyclist', 'Truck') for t in self.detection[2]]
+        # select_type_row = [t in ('Van', 'Car', 'Pedestrian', 'Tram', 'Cyclist', 'Truck') for t in self.detection[2]]
+        select_type_row = [t in ('Pedestrian', '') for t in self.detection[2]]
+
         self.detection = self.detection[select_type_row]
         select_occluded_row = [t in [0, 1] for t in self.detection[4]]
         self.detection = self.detection[select_occluded_row]
+        self.tracks = Tracks()
+        self.recorder = {}
+        if len(self.detection) == 0:
+            self.max_frame_index = 0
+            return
+
 
         select_truncation_row = [t < 0.7 for t in self.detection[3]]
         self.detection = self.detection[select_truncation_row]
@@ -102,8 +110,6 @@ class GTSingleParser:
             self.max_frame_index = max(self.detection_group_keys)
 
         # 3. update tracks
-        self.tracks = Tracks()
-        self.recorder = {}
         for key in self.detection_group_keys:
             det = self.detection_group.get_group(key).values
             ids = np.array(det[:, 1]).astype(int)
@@ -271,25 +277,55 @@ class KITTITrainDataset(data.Dataset):
         # 2. init GTParser
         self.parser = GTParser(self.kitti_image_root, self.kitti_detection_root)
 
+        # 3. map
+        self.map_frame = {}
+
     def __getitem__(self, item):
         current_image, current_box, next_image, next_box, labels = self.parser[item]
 
+        new_item = item
+        move_forward = True
+
+        use_map = item in self.map_frame.keys()
+        if use_map:
+            new_item = self.map_frame[item]
+            current_image, current_box, next_image, next_box, labels = self.parser[new_item]
+        else:
+            while current_image is None and not use_map:
+                if move_forward:
+                    new_item += 1
+                    if new_item >= self.parser.len:
+                        move_forward = False
+                        new_item = item - 1
+                        continue
+                    current_image, current_box, next_image, next_box, labels = self.parser[new_item]
+                else:
+                    new_item -= 1
+                    current_image, current_box, next_image, next_box, labels = self.parser[new_item]
+            self.map_frame[item] = new_item
+
+
+        # none data process
+        '''
         wait_time = 0
         current_index_gap = 0
-        # back data process
         while current_image is None:
+            current_image, current_box, next_image, next_box, labels = self.parser[item]
+
             if current_index_gap < len(self.frame_gap_range):
                 current_image, current_box, next_image, next_box, labels = self.parser[max(item+self.frame_gap_range[current_index_gap], 0)]
             elif current_index_gap < 100:
                 current_image, current_box, next_image, next_box, labels = self.parser[
                     max(item + random.choice(list(range(30, 100))+list(range(-100, -30))), 0)]
             else:
+                # cannot find item any more
+
                 current_image, current_box, next_image, next_box, labels = self.parser[
                     max(item + random.choice(list(range(100, 200)) + list(range(-200, -100))), 0)]
             current_index_gap += 1
             # print('None processing.')
-
-        if self.transform is None:
+        '''
+        if self.transform is None or current_image is None:
             return current_image, current_box, next_image, next_box, labels
 
         # change the label to max_object x max_object

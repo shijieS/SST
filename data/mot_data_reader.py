@@ -8,6 +8,7 @@ class MOTDataReader:
         self.detection_file_name = detection_file_name
         self.image_format = os.path.join(self.image_folder, '{0:06d}.jpg')
         self.detection = pd.read_csv(self.detection_file_name, header=None)
+        # self.detection = self.detection[self.detection[6] > 0.3]
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())
 

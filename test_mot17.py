@@ -1,4 +1,4 @@
-from tracker import SSTTracker
+from tracker import SSTTracker, TrackerConfig, Track
 # from sst_tracker import TrackSet as SSTTracker
 import cv2
 from data.mot_data_reader import MOTDataReader
@@ -13,29 +13,40 @@ parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=True, help='save video if true')
+parser.add_argument('--save_video', default=False, help='save video if true')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
 
-def test():
+def test(choice = None):
     if args.type == 'train':
         dataset_index = [2, 4, 5, 9, 10, 11, 13]
-        # dataset_index = [2]
+        # dataset_index = [4]
         # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
         # dataset_detection_type = {'-FRCNN', '-SDP'}
         dataset_detection_type = {'-FRCNN'}
 
     if args.type == 'test':
         dataset_index = [1, 3, 6, 7, 8, 12, 14]
-        # dataset_index = [6]
+        dataset_index = [1]
         # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
         dataset_detection_type = {'-FRCNN', '-SDP'}
+        dataset_detection_type = {'-DPM'}
 
     dataset_image_folder_format = os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/img1')
     detection_file_name_format=os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/det/det.txt')
-    saved_file_name_format = 'MOT'+str(args.mot_version)+'-{:02}{}.txt'
-    save_video_name_format = 'MOT'+str(args.mot_version)+'-{:02}{}.avi'
+
+    save_folder = ''
+    choice_str = ''
+    if not choice is None:
+        choice_str = TrackerConfig.get_configure_str(choice)
+        if not os.path.exists(choice_str):
+            os.mkdir(choice_str)
+            save_folder = choice_str + '/'
+        else:
+            return
+    saved_file_name_format = save_folder + 'MOT'+str(args.mot_version)+'-{:02}{}.txt'
+    save_video_name_format = save_folder + 'MOT'+str(args.mot_version)+'-{:02}{}.avi'
 
 
     f = lambda format_str: [format_str.format(index, type) for type in dataset_detection_type for index in dataset_index]
@@ -78,7 +89,7 @@ def test():
             timer.tic()
             image_org = tracker.update(img, det[:, 2:6], args.show_image)
             timer.toc()
-            print('{}:{}, {}\r'.format(saved_file_name, i, int(i*100/len(reader))))
+            print('{}:{}, {}, {}\r'.format(saved_file_name, i, int(i*100/len(reader)), choice_str))
             if args.show_image and not image_org is None:
                 cv2.imshow('res', image_org)
                 cv2.waitKey(10)
@@ -102,4 +113,14 @@ def test():
     print(timer.average_time)
 
 if __name__ == '__main__':
-    test()
+    all_choices = TrackerConfig.get_all_choices_max_track_node()
+    iteration =     3
+    # test()
+
+    for i in range(10):
+        c = all_choices[-i]
+
+        choice_str = TrackerConfig.get_configure_str(c)
+        TrackerConfig.set_configure(c)
+        print('=============================={}.{}=============================='.format(i, choice_str))
+        test(c)
