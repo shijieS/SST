@@ -2,9 +2,11 @@ import numpy as np
 import json
 
 configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
-                   'init_train_kitti', 'init_test_kitti', 'exp_train_mot17_final_net']
+                   'init_train_kitti', 'init_test_kitti',
+                   'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
+                   'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'exp_train_mot17_final_net'
+current_select_configure = 'exp_test_mot17_final_net'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -112,7 +114,7 @@ def init_train_mot17():
     config['min_gap_frame'] = 0
     config['min_visibility'] = 0.3
 
-# init_train_mot17()
+
 all_functions += [init_train_mot17]
 
 def exp_train_mot17_final_net():
@@ -144,6 +146,51 @@ def exp_train_mot17_final_net():
 
 all_functions += [exp_train_mot17_final_net]
 
+
+def exp_test_mot17_final_net():
+    config['resume'] = '/media/jianliu/ssm/ssj/github/weights/sst300_0712_66400.pth'
+    config['mot_root'] = '/media/jianliu/ssm/dataset/dataset/MOT/17/MOT17'
+    config['batch_size'] = 1
+    config['write_file'] = True
+    config['tensorboard'] = True
+    config['save_combine'] = False
+    config['type'] = 'train'
+    config['final_net']['900'] = [int(config['final_net']['900'][0]), 1]
+    config['max_object'] = 80
+
+all_functions += [exp_test_mot17_final_net]
+
+
+def exp_train_mot17_final_net_lab():
+
+    config['mot_root'] = '/media/jianliu/ssm/dataset/dataset/MOT/17/MOT17'
+    config['base_net_folder'] = '/media/jianliu/ssm/ssj/github/weights/vgg16_reducedfc.pth'
+    config['log_folder'] = '/media/jianliu/ssm/ssj/train/0601-E120-M80-G30-log'
+    config['save_folder'] = '/media/jianliu/ssm/ssj/train/0601-E120-M80-G30-weights'
+    config['save_images_folder'] = '/media/jianliu/ssm/ssj/train/0601-E120-M80-G30-images'
+    config['type'] = 'train'
+    config['dataset_type'] = 'train'
+    config['resume'] = None
+    config['detector'] = 'FRCNN'
+    config['start_iter'] = 0
+    config['iteration_epoch_num'] = 120
+    config['iterations'] = config['start_iter'] + config['epoch_size'] * config['iteration_epoch_num'] + 50
+    config['batch_size'] = 8
+    config['learning_rate'] = 1e-2
+    config['learning_rate_decay_by_epoch'] = (50, 80, 100, 110)
+    config['save_weight_every_epoch_num'] = 5
+    config['min_gap_frame'] = 0
+    config['max_gap_frame'] = 30
+    config['false_constant'] = 10
+    config['num_workers'] = 16
+    config['cuda'] = True
+    config['max_object'] = 80
+    config['min_visibility'] = 0.3
+
+
+all_functions += [exp_train_mot17_final_net_lab]
+
+
 def init_train_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
     config['kitti_detection_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/tracking_label_2'
@@ -165,7 +212,9 @@ def init_train_kitti():
     config['max_gap_frame'] = 30
     config['min_gap_frame'] = 0
 
+
 all_functions += [init_train_kitti]
+
 
 def init_test_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'
@@ -178,8 +227,8 @@ def init_test_kitti():
     config['false_constant'] = 10
     config['max_object'] = 80
 
-all_functions += [init_test_kitti]
 
+all_functions += [init_test_kitti]
 
 for f in all_functions:
     if f.__name__ == current_select_configure:

@@ -159,7 +159,8 @@ class SST(nn.Module):
         x_t = x_t[:, col_slice]
 
         x = Variable(torch.zeros(pre_num, next_num+1))
-        x[0:pre_num, 0:next_num] = torch.max(x_f[0:pre_num, 0:next_num], x_t[0:pre_num, 0:next_num])
+        # x[0:pre_num, 0:next_num] = torch.max(x_f[0:pre_num, 0:next_num], x_t[0:pre_num, 0:next_num])
+        x[0:pre_num, 0:next_num] = (x_f[0:pre_num, 0:next_num] + x_t[0:pre_num, 0:next_num]) / 2.0
         x[:, next_num:next_num+1] = x_f[:pre_num, next_num:next_num+1]
         if fill_up_column and pre_num > 1:
             x = torch.cat([x, x[:, next_num:next_num+1].repeat(1, pre_num-1)], dim=1)

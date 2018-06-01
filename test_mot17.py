@@ -13,7 +13,7 @@ parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=False, help='save video if true')
+parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
@@ -114,8 +114,8 @@ def test(choice = None):
 
 if __name__ == '__main__':
     all_choices = TrackerConfig.get_all_choices_max_track_node()
-    iteration =     3
-    # test()
+    iteration = 3
+    test()
 
     for i in range(10):
         c = all_choices[-i]

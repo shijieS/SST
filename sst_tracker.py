@@ -1,5 +1,5 @@
 from layer.sst import build_sst
-from config.config import config, init_tracker_config
+from config.config import config
 import cv2
 import numpy as np
 import torch
@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 
 class TrackerConfig:
 
-    max_record_frame = 20
-    max_track_age = 20
-    max_track_node = 20
-    max_draw_track_node = 20
+    max_record_frame = 25
+    max_track_age = 25
+    max_track_node = 25
+    max_draw_track_node = 25
 
     sst_model_path = config['resume']
     cuda = config['cuda']
@@ -27,7 +27,7 @@ class TrackerConfig:
 
     max_bad_node = 0.9
 
-    decay = 0.98
+    decay = 0.9995
 
 
 class FeatureRecorder:

@@ -1,2 +1,3 @@
-./result
-./backup
+result/
+backup/
+.idea/

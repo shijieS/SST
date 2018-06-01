@@ -18,10 +18,10 @@ press the follows button for more function:
 ''')
 
 parser = argparse.ArgumentParser(description='Single Shot Joint Tracker Train')
-parser.add_argument('--image1', default="C:/Users/00097307/Dropbox/tracking/images/000001.jpg", help='Previous Image')
-parser.add_argument('--image2', default="C:/Users/00097307/Dropbox/tracking/images/000030.jpg", help='Current Image')
-parser.add_argument('--model_path', default="C:/Users/00097307/Dropbox/tracking/pretrained/sst300_0712_9960.pth", help='sst net model path')
-parser.add_argument('--cuda', default=False, help="use gpu or not")
+parser.add_argument('--image1', default="/media/jianliu/ssm/dataset/dataset/MOT/17/MOT17/train/MOT17-11-FRCNN/img1/000001.jpg", help='Previous Image')
+parser.add_argument('--image2', default="/media/jianliu/ssm/dataset/dataset/MOT/17/MOT17/train/MOT17-11-FRCNN/img1/000030.jpg", help='Current Image')
+parser.add_argument('--model_path', default="/media/jianliu/ssm/ssj/github/weights/sst300_0712_66400.pth", help='sst net model path')
+parser.add_argument('--cuda', default=True, help="use gpu or not")
 
 args = parser.parse_args()
 
@@ -35,6 +35,7 @@ class CompareTools:
     sst = None
     cuda = False
     resize_rate = 0.4
+    drawing = False
 
     save_objects = {'rect' : [], 'text': []}
 
@@ -99,19 +100,19 @@ class CompareTools:
 
     @staticmethod
     def select_object(event, x, y, flag, param):
-        global ix, iy, drawing
+        global ix, iy
 
         color = tuple((np.random.rand(3) * 255).astype(int).tolist())
 
         if event == cv2.EVENT_LBUTTONDOWN:
-            drawing = True
+            CompareTools.drawing = True
             ix, iy = x, y
         elif event == cv2.EVENT_MOUSEMOVE:
-            if drawing == True:
+            if CompareTools.drawing == True:
                 cv2.rectangle(CompareTools.img, (ix, iy), (x, y), color, 2)
 
         elif event == cv2.EVENT_LBUTTONUP:
-            drawing = False
+            CompareTools.drawing = False
             cv2.rectangle(CompareTools.img, (ix, iy), (x, y), color, 2)
 
             CompareTools.save_objects['rect'] += [(

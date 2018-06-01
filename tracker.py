@@ -1,5 +1,5 @@
 from layer.sst import build_sst
-from config.config import config, init_tracker_config
+from config.config import config
 import cv2
 import numpy as np
 import torch
@@ -171,7 +171,7 @@ class TrackerConfig:
 
     max_bad_node = 0.9
 
-    decay = 0.93
+    decay = 0.995
 
     roi_verify_max_iteration = 2
     roi_verify_punish_rate = 0.6
