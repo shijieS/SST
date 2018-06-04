@@ -8,7 +8,7 @@ from utils.timer import Timer
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description='Single Shot Joint Tracker Test')
+parser = argparse.ArgumentParser(description='Single Shot Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
@@ -18,7 +18,8 @@ parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
 
-def test(choice = None):
+
+def test(choice=None):
     if args.type == 'train':
         dataset_index = [2, 4, 5, 9, 10, 11, 13]
         # dataset_index = [4]
@@ -60,7 +61,6 @@ def test(choice = None):
         i = 0
         result = list()
         result_str = saved_file_name
-
 
         for item in reader:
             i += 1

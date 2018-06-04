@@ -1,6 +1,6 @@
 from tracker import SSTTracker
 import cv2
-from data.kitti_data_reader import  KITTIDataReader
+from data.kitti_detection_data_reader import  KITTIDataReader
 from data.mot_data_reader import MOTDataReader
 import numpy as np
 from config.config import config

@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import cv2
 import numpy as np
+
+
 class MOTDataReader:
     def __init__(self, image_folder, detection_file_name):
         self.image_folder = image_folder

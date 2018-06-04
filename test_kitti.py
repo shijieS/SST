@@ -1,7 +1,7 @@
 # from tracker import SSTTracker
 from sst_tracker import TrackSet as SSTTracker
 import cv2
-from data.kitti_data_reader import KITTIDataReader
+from data.kitti_detection_data_reader import KITTIDataReader
 import numpy as np
 from config.config import config
 from utils.timer import Timer

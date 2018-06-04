@@ -3,10 +3,11 @@ import json
 
 configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'init_train_kitti', 'init_test_kitti',
+                   'init_train_ua', 'init_test_ua'
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'init_train_mot17'
+current_select_configure = 'init_test_ua'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -62,9 +63,13 @@ config = {
 config['final_net']['900'][0] = np.sum(config['selector_channel'])*2
 
 all_functions = []
+
+
 '''
 test mot train dataset
 '''
+
+
 def init_test_mot16():
     '''
     ssm
@@ -77,7 +82,9 @@ def init_test_mot16():
     config['save_combine'] = False
     config['type'] = 'test'
 
+
 all_functions += [init_test_mot16]
+
 
 def init_test_mot17():
     '''
@@ -91,7 +98,9 @@ def init_test_mot17():
     config['save_combine'] = False
     config['type'] = 'train'
 
+
 all_functions += [init_test_mot17]
+
 
 def init_train_mot17():
     config['epoch_size'] = 664
@@ -122,6 +131,7 @@ def init_train_mot17():
 
 all_functions += [init_train_mot17]
 
+
 def exp_train_mot17_final_net():
     config['epoch_size'] = 664
     config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
@@ -149,6 +159,7 @@ def exp_train_mot17_final_net():
     config['min_visibility'] = 0.3
     config['final_net']['900'] = [int(config['final_net']['900'][0]), 1]
 
+
 all_functions += [exp_train_mot17_final_net]
 
 
@@ -163,11 +174,11 @@ def exp_test_mot17_final_net():
     config['final_net']['900'] = [int(config['final_net']['900'][0]), 1]
     config['max_object'] = 80
 
+
 all_functions += [exp_test_mot17_final_net]
 
 
 def exp_train_mot17_final_net_lab():
-
     config['mot_root'] = '/media/jianliu/ssm/dataset/dataset/MOT/17/MOT17'
     config['base_net_folder'] = '/media/jianliu/ssm/ssj/github/weights/vgg16_reducedfc.pth'
     config['log_folder'] = '/media/jianliu/ssm/ssj/train/0601-E120-M80-G30-log'
@@ -207,7 +218,6 @@ def init_train_kitti():
     config['resume'] = '/home/ssm/ssj/weights/KITTI/weights0406-I60k-M80-G5-C10-All-Continue/ssj300_0712_140000.pth' #None
     config['start_iter'] = 0
     config['cuda'] = True
-    config['min_gap_frame'] = 0
     config['batch_size'] = 8
     config['num_workers'] = 16
     config['iterations'] = 30050
@@ -234,6 +244,54 @@ def init_test_kitti():
 
 
 all_functions += [init_test_kitti]
+
+
+def init_train_ua():
+    config['epoch_size'] = 20861
+
+    config['base_net_folder'] = '/media/jianliu/ssm/ssj/github/weights/vgg16_reducedfc.pth'
+    config['log_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-log'
+    config['save_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-weight'
+    config['save_images_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-images'
+    config['ua_image_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/Insight-MVT_Annotation_Train'
+    config['ua_detection_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/gt'
+    config['ua_ignore_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/igrs'
+    config['resume'] = None
+    config['start_iter'] = 0
+    config['iteration_epoch_num'] = 20
+    config['iterations'] = config['start_iter'] + config['epoch_size'] * config['iteration_epoch_num'] + 50
+    config['batch_size'] = 4
+    config['learning_rate'] = 1e-2
+    config['learning_rate_decay_by_epoch'] = (10, 16, 18, 20)
+    config['save_weight_every_epoch_num'] = 5
+    config['min_gap_frame'] = 0
+    config['max_gap_frame'] = 30
+    config['false_constant'] = 10
+    config['num_workers'] = 16
+    config['cuda'] = True
+    config['max_object'] = 80
+
+
+all_functions += [init_train_ua]
+
+
+def init_test_ua():
+    config['log_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-log'
+    config['save_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-weight'
+    config['save_images_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-images'
+    config['ua_image_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/Insight-MVT_Annotation_Train'
+    config['ua_detection_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/gt'
+    config['ua_ignore_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/igrs'
+    config['resume'] = None
+    config['batch_size'] = 1
+    config['min_gap_frame'] = 0
+    config['max_gap_frame'] = 30
+    config['false_constant'] = 10
+    config['cuda'] = True
+    config['max_object'] = 80
+
+
+all_functions += [init_test_ua]
 
 for f in all_functions:
     if f.__name__ == current_select_configure:

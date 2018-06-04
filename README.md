@@ -28,6 +28,21 @@ Our network is designed by pytorch framework. It is also trained and tested in U
     - [motmetrics](https://github.com/cheind/py-motmetrics)
     - [tensorboardX](https://github.com/lanpa/tensorboard-pytorch.git)
 
+
+## Dataset
+
+### MOT17
+### UA-DETRAC
+
+Download all the package in the [official set](http://detrac-db.rit.albany.edu/download) into a folder "ua", which is the root of this dataset. do
+
+```shell
+unzip \*.zip
+```
+
+
+
+
 # Best Result
 
 ![](./image/accuracy20180420.png)
