@@ -14,6 +14,7 @@ parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=True, help='save video if true')
+parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
@@ -37,18 +38,21 @@ def test(choice=None):
     dataset_image_folder_format = os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/img1')
     detection_file_name_format=os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/det/det.txt')
 
+    if not os.path.exists(args.log_folder):
+        os.mkdir(args.log_folder)
+
     save_folder = ''
     choice_str = ''
     if not choice is None:
         choice_str = TrackerConfig.get_configure_str(choice)
-        if not os.path.exists(choice_str):
-            os.mkdir(choice_str)
-            save_folder = choice_str + '/'
+        save_folder = os.path.join(args.log_folder, choice_str)
+        if not os.path.exists(save_folder):
+            os.mkdir(save_folder)
         else:
             return
-    saved_file_name_format = save_folder + 'MOT'+str(args.mot_version)+'-{:02}{}.txt'
-    save_video_name_format = save_folder + 'MOT'+str(args.mot_version)+'-{:02}{}.avi'
 
+    saved_file_name_format = os.path.join(save_folder, 'MOT'+str(args.mot_version)+'-{:02}{}.txt')
+    save_video_name_format = os.path.join(save_folder, 'MOT'+str(args.mot_version)+'-{:02}{}.avi')
 
     f = lambda format_str: [format_str.format(index, type) for type in dataset_detection_type for index in dataset_index]
 
@@ -89,10 +93,10 @@ def test(choice=None):
             timer.tic()
             image_org = tracker.update(img, det[:, 2:6], args.show_image)
             timer.toc()
-            print('{}:{}, {}, {}\r'.format(saved_file_name, i, int(i*100/len(reader)), choice_str))
+            print('{}:{}, {}, {}\r'.format(os.path.basename(saved_file_name), i, int(i*100/len(reader)), choice_str))
             if args.show_image and not image_org is None:
                 cv2.imshow('res', image_org)
-                cv2.waitKey(10)
+                cv2.waitKey(1)
 
             if args.save_video and not image_org is None:
                 vw.write(image_org)
@@ -113,14 +117,24 @@ def test(choice=None):
     print(timer.average_time)
 
 if __name__ == '__main__':
-    all_choices = TrackerConfig.get_all_choices_max_track_node()
+    all_choices = TrackerConfig.get_choices_age_node()
     iteration = 3
-    test()
+    # test()
 
-    for i in range(10):
-        c = all_choices[-i]
+    i = 0
+    for age in range(10):
+        for node in range(10):
+            c = (0, 0, 0, 0, age, node)
+            choice_str = TrackerConfig.get_configure_str(c)
+            TrackerConfig.set_configure(c)
+            print('=============================={}.{}=============================='.format(i, choice_str))
+            test(c)
+            i += 1
 
-        choice_str = TrackerConfig.get_configure_str(c)
-        TrackerConfig.set_configure(c)
-        print('=============================={}.{}=============================='.format(i, choice_str))
-        test(c)
+    # for i in range(10):
+    #     c = all_choices[-i]
+    #
+    #     choice_str = TrackerConfig.get_configure_str(c)
+    #     TrackerConfig.set_configure(c)
+    #     print('=============================={}.{}=============================='.format(i, choice_str))
+    #     test(c)

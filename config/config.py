@@ -7,7 +7,7 @@ configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'init_test_ua'
+current_select_configure = 'init_test_mot17'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -90,8 +90,9 @@ def init_test_mot17():
     '''
     ssm
     '''
-    config['resume'] = '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30-Continue0509v1.pth'
+    config['resume'] = '/home/ssm/ssj/weights/MOT17/0601-E120-M80-G30-weights/sst300_0712_83000.pth'
     config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
+    config['log_folder'] = '/media/ssm/seagate/logs/0601-age-node'
     config['batch_size'] = 1
     config['write_file'] = True
     config['tensorboard'] = True

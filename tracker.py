@@ -151,7 +151,6 @@ class TrackUtil:
         t2.valid = False
 
 class TrackerConfig:
-
     max_record_frame = 30
     max_track_age = 30
     max_track_node = 30
@@ -199,7 +198,7 @@ class TrackerConfig:
 
         roi_verify_punish_rates = [0.6, 0.4, 0.2, 0.1, 0.0]
 
-        max_track_ages = [i*6 for i in range(1,6)]
+        max_track_ages = [i*3 for i in range(1,11)]
         max_track_nodes = [i*3 for i in range(1,11)]
 
         TrackerConfig.min_iou_frame_gap = min_iou_frame_gaps[all_choice[0]]
@@ -225,7 +224,11 @@ class TrackerConfig:
 
     @staticmethod
     def get_all_choices_max_track_node():
-        return [(1, 7, 0, 0, 4, i6) for i6 in range(10)]
+        return [(1, i2, 0, 0, 4, 2) for i2 in range(11)]
+
+    @staticmethod
+    def get_choices_age_node():
+        return [(0, 0, 0, 0, a, n) for a in range(10) for n in range(10)]
 
 class FeatureRecorder:
     '''
@@ -465,9 +468,11 @@ class Tracks:
         similarity = np.array(similarity)
 
         track_num = similarity.shape[0]
-        box_num = similarity.shape[1]
+        if track_num > 0:
+            box_num = similarity.shape[1]
+        else:
+            box_num = 0
         similarity = np.repeat(similarity, [1]*(box_num-1)+[track_num], axis=1)
-        # add extra column
         return np.array(similarity), np.array(ids)
 
     def one_frame_pass(self):
