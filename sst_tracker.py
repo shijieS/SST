@@ -29,7 +29,6 @@ class TrackerConfig:
 
     decay = 0.9995
 
-
 class FeatureRecorder:
     '''
     Record features and boxes every frame

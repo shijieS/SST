@@ -7,7 +7,7 @@ configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'init_test_mot17'
+current_select_configure = 'init_train_ua'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -250,11 +250,11 @@ all_functions += [init_test_kitti]
 def init_train_ua():
     config['epoch_size'] = 20861
 
-    config['base_net_folder'] = '/media/jianliu/ssm/ssj/github/weights/vgg16_reducedfc.pth'
-    config['log_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-log'
-    config['save_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-weight'
-    config['save_images_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-images'
-    config['ua_image_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/Insight-MVT_Annotation_Train'
+    config['base_net_folder'] = '/home/ssm/ssj/weights/UATRAC/vgg16_reducedfc.pth'
+    config['log_folder'] = '/home/ssm/ssj/weights/UATRAC/0602-E25-M80-G30-log'
+    config['save_folder'] = '/home/ssm/ssj/weights/UATRAC/0602-E25-M80-G30-weight'
+    config['save_images_folder'] = '/home/ssm/ssj/weights/UATRAC/0602-E25-M80-G30-images'
+    config['ua_image_root'] = '/media/ssm/seagate/dataset/Insight-MVT_Annotation_Train'
     config['ua_detection_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/gt'
     config['ua_ignore_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/igrs'
     config['resume'] = None

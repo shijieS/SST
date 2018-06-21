@@ -472,6 +472,10 @@ class Tracks:
             box_num = similarity.shape[1]
         else:
             box_num = 0
+
+        if track_num == 0 :
+            return np.array(similarity), np.array(ids)
+
         similarity = np.repeat(similarity, [1]*(box_num-1)+[track_num], axis=1)
         return np.array(similarity), np.array(ids)
 
@@ -611,50 +615,51 @@ class SSTTracker:
         # get tracks similarity
         y, ids = self.tracks.get_similarity(self.frame_index, self.recorder)
 
-        #3) find the corresponding by the similar matrix
-        row_index, col_index = linear_sum_assignment(-y)
-        col_index[col_index >= detection_org.shape[0]] = -1
+        if len(y) > 0:
+            #3) find the corresponding by the similar matrix
+            row_index, col_index = linear_sum_assignment(-y)
+            col_index[col_index >= detection_org.shape[0]] = -1
 
-        # verification by iou
-        verify_iteration = 0
-        while verify_iteration < TrackerConfig.roi_verify_max_iteration:
-            is_change_y = False
+            # verification by iou
+            verify_iteration = 0
+            while verify_iteration < TrackerConfig.roi_verify_max_iteration:
+                is_change_y = False
+                for i in row_index:
+                    box_id = col_index[i]
+                    track_id = ids[i]
+
+                    if box_id < 0:
+                        continue
+                    t = self.tracks.get_track_by_id(track_id)
+                    if not t.verify(self.frame_index, self.recorder, box_id):
+                        y[i, box_id] *= TrackerConfig.roi_verify_punish_rate
+                        is_change_y = True
+                if is_change_y:
+                    row_index, col_index = linear_sum_assignment(-y)
+                    col_index[col_index >= detection_org.shape[0]] = -1
+                else:
+                    break
+                verify_iteration += 1
+
+            print(verify_iteration)
+
+            #4) update the tracks
             for i in row_index:
-                box_id = col_index[i]
                 track_id = ids[i]
-
-                if box_id < 0:
-                    continue
                 t = self.tracks.get_track_by_id(track_id)
-                if not t.verify(self.frame_index, self.recorder, box_id):
-                    y[i, box_id] *= TrackerConfig.roi_verify_punish_rate
-                    is_change_y = True
-            if is_change_y:
-                row_index, col_index = linear_sum_assignment(-y)
-                col_index[col_index >= detection_org.shape[0]] = -1
-            else:
-                break
-            verify_iteration += 1
-
-        print(verify_iteration)
-
-        #4) update the tracks
-        for i in row_index:
-            track_id = ids[i]
-            t = self.tracks.get_track_by_id(track_id)
-            col_id = col_index[i]
-            if col_id < 0:
-                continue
-            node = Node(self.frame_index, col_id)
-            t.add_node(self.frame_index, self.recorder, node)
-
-        #5) add new track
-        for col in range(len(detection_org)):
-            if col not in col_index:
-                node = Node(self.frame_index, col)
-                t = Track()
+                col_id = col_index[i]
+                if col_id < 0:
+                    continue
+                node = Node(self.frame_index, col_id)
                 t.add_node(self.frame_index, self.recorder, node)
-                self.tracks.append(t)
+
+            #5) add new track
+            for col in range(len(detection_org)):
+                if col not in col_index:
+                    node = Node(self.frame_index, col)
+                    t = Track()
+                    t.add_node(self.frame_index, self.recorder, node)
+                    self.tracks.append(t)
 
         # remove the old track
         self.tracks.one_frame_pass()

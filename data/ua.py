@@ -315,7 +315,7 @@ class UATrainDataset(data.Dataset):
             return current_image, current_box, next_image, next_box, labels
 
         # change the label to max_object x max_object
-        while labels is None:
+        while labels is None or current_image is None or next_image is None or next_box is None or current_box is None:
             current_image, current_box, next_image, next_box, labels = self.parser[
                 random.randint(0, len(self))
                 ]

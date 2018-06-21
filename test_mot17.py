@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='Single Shot Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
-parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
+parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
@@ -23,6 +23,7 @@ args = parser.parse_args()
 def test(choice=None):
     if args.type == 'train':
         dataset_index = [2, 4, 5, 9, 10, 11, 13]
+        # dataset_index = [13]
         # dataset_index = [4]
         # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
         # dataset_detection_type = {'-FRCNN', '-SDP'}
