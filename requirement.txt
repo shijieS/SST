@@ -4,3 +4,8 @@ wget
 googledrivedownloader
 requests
 tensorboardX
+scipy
+matplotlib
+opencv-python
+pandas
+
