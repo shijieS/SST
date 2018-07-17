@@ -7,7 +7,7 @@ configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'init_test_mot17'
+current_select_configure = 'init_test_ua'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -279,20 +279,18 @@ all_functions += [init_train_ua]
 
 
 def init_test_ua():
-    config['log_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-log'
-    config['save_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-weight'
-    config['save_images_folder'] = '/media/jianliu/ssm/ssj/github/logs/0602-E25-M80-G30-images'
+    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/0621-E25-M80-G30-test'
     config['ua_image_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/Insight-MVT_Annotation_Train'
-    config['ua_detection_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/gt'
-    config['ua_ignore_root'] = '/media/jianliu/ssm/dataset/dataset/UA-DETRAC/igrs'
-    config['resume'] = None
+    config['ua_detection_root'] = '/media/ssm/seagate/UA-DETRAC/EB'
+    config['ua_ignore_root'] = '/media/ssm/seagate/UA-DETRAC/igrs'
+    config['resume'] = '/media/ssm/seagate/weights/UA-DETRAC/0621-E25-M80-G30-weight/sst300_0712_104300.pth'
     config['batch_size'] = 1
     config['min_gap_frame'] = 0
     config['max_gap_frame'] = 30
     config['false_constant'] = 10
     config['cuda'] = True
     config['max_object'] = 80
-
+    config['type'] = 'train'
 
 all_functions += [init_test_ua]
 

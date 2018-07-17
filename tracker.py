@@ -422,8 +422,6 @@ class Track:
                     return False
         return True
 
-
-
 class Tracks:
     '''
     Track set. It contains all the tracks and manage the tracks. it has the following information
