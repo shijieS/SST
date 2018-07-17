@@ -13,7 +13,7 @@ parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
 parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=True, help='save video if true')
+parser.add_argument('--save_video', default=False, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
@@ -27,7 +27,7 @@ def test(choice=None):
         # dataset_index = [4]
         # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
         # dataset_detection_type = {'-FRCNN', '-SDP'}
-        dataset_detection_type = {'-FRCNN'}
+        dataset_detection_type = {'-SDP'}
 
     if args.type == 'test':
         dataset_index = [1, 3, 6, 7, 8, 12, 14]
