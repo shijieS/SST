@@ -23,8 +23,8 @@ class UADetectionDataReader:
         self.image_format = os.path.join(self.image_folder, 'img{0:05d}.jpg')
         self.detection = pd.read_csv(self.detection_file_name, sep=',', header=None, dtype=datatype)
 
-        self.detection.iloc[:, 4] += self.detection.iloc[:, 2]
-        self.detection.iloc[:, 5] += self.detection.iloc[:, 3]
+        # self.detection.iloc[:, 4] += self.detection.iloc[:, 2]
+        # self.detection.iloc[:, 5] += self.detection.iloc[:, 3]
 
         # read ignore file
         mask = None
@@ -32,8 +32,8 @@ class UADetectionDataReader:
         if ignore_file_name is not None and os.stat(self.ignore_file_name).st_size > 0:
             self.ignore = pd.read_csv(self.ignore_file_name, sep=',', header=None, dtype=datatype_ignore)
             self.ignore = self.ignore.values
-            cx = (self.detection.iloc[:, 2].values + self.detection.iloc[:, 4].values)/2.0
-            cy = (self.detection.iloc[:, 3].values + self.detection.iloc[:, 5].values)/2.0
+            cx = (2*self.detection.iloc[:, 2].values + self.detection.iloc[:, 4].values)/2.0
+            cy = (2*self.detection.iloc[:, 3].values + self.detection.iloc[:, 5].values)/2.0
             self.ignore = np.array([[r[0], r[1], r[0] + r[2], r[1] + r[3]] for r in self.ignore])
             for rect in self.ignore:
                 l = rect[0]
