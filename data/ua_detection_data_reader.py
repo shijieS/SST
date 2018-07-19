@@ -57,6 +57,7 @@ class UADetectionDataReader:
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())
 
+        self.length = len(self)
     def __len__(self):
         return len(self.detection_group_keys)
 
@@ -72,5 +73,7 @@ class UADetectionDataReader:
         return cv2.imread(self.image_format.format(index))
 
     def __getitem__(self, item):
+        if item >= self.length:
+            raise IndexError()
         return (self.get_image_by_index(item),
                 self.get_detection_by_index(item))

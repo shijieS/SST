@@ -16,10 +16,9 @@ parser.add_argument('--save_folder', default=config['save_folder'], help='save f
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--use_ignore', default=True, help='use ignore or not')
-parser.add_argument('--detection_threshold', default=0.0, help='the threshold of detection')
+parser.add_argument('--detection_threshold', default=0.3, help='the threshold of detection')
 
 args = parser.parse_args()
-
 
 def test(choice=None):
     image_root = args.ua_image_root
@@ -49,17 +48,15 @@ def test(choice=None):
     ignore_file_base_name = [os.path.basename(f)[:-8] for f in all_ignore_files]
     detection_file_base_name = [os.path.basename(f)[:9] for f in all_detection_files]
 
-    saved_file_name_format = os.path.join(save_folder, '{}.txt')
-    saved_video_name_format = os.path.join(save_folder, '{}.avi')
-
     choice_str = ''
     if not choice is None:
-        choice_str = TrackerConfig.get_configure_str(choice)
-        if not os.path.exists(choice_str):
-            os.mkdir(choice_str)
-            save_folder = choice_str + '/'
-        else:
-            return
+        choice_str =  TrackerConfig.get_configure_str(choice)
+        save_folder = os.path.join(args.save_folder, choice_str)
+        if not os.path.exists(save_folder):
+            os.mkdir(save_folder)
+
+    saved_file_name_format = os.path.join(save_folder, '{}.txt')
+    saved_video_name_format = os.path.join(save_folder, '{}.avi')
 
     timer = Timer()
     for image_folder in all_image_folders:
@@ -81,7 +78,6 @@ def test(choice=None):
         tracker = SSTTracker()
         reader = UADetectionDataReader(image_folder, detection_file, ignore_file if args.use_ignore else None,
                                        args.detection_threshold)
-
         i = 0
         result = list()
         result_str = saved_file_name
@@ -110,11 +106,12 @@ def test(choice=None):
             timer.tic()
             image_org = tracker.update(img, det[:, 2:6], args.show_image)
             timer.toc()
-            print('{}:{}, {}, {}\r'.format(saved_file_name, i, int(i * 100 / len(reader)), choice_str))
+            if i % 20 == 0:
+                print('{}:{}, {}, {}, {}\r'.format(saved_file_name, i, int(i * 100 / reader.length), choice_str, args.detection_threshold))
 
             if args.show_image and not image_org is None:
                 cv2.imshow('res', image_org)
-                cv2.waitKey(10)
+                cv2.waitKey(1)
 
             if args.save_video and not image_org is None:
                 vw.write(image_org)
@@ -135,14 +132,22 @@ def test(choice=None):
 
 
 if __name__ == '__main__':
-    all_choices = TrackerConfig.get_all_choices_max_track_node()
-    iteration = 3
-    test()
+    c = TrackerConfig.get_ua_choice()
+    threshold = [i*0.1 for i in range(11)]
+    save_folder = args.save_folder
+    for t in threshold:
+        if t == 0.3:
+            continue
+        args.detection_threshold = t
+        args.save_folder = os.path.join(save_folder, '{0:0.1f}'.format(0.1))
+        if not os.path.exists(args.save_folder):
+            os.mkdir(args.save_folder)
+        test(c)
 
     # for i in range(10):
-    #     c = all_choices[-i]
-    #
-    #     choice_str = TrackerConfig.get_configure_str(c)
-    #     TrackerConfig.set_configure(c)
-    #     print('=============================={}.{}=============================='.format(i, choice_str))
-    #     test(c)
+    #     #     c = all_choices[-i]
+    #     #
+    #     #     choice_str = TrackerConfig.get_configure_str(c)
+    #     #     TrackerConfig.set_configure(c)
+    #     #     print('=============================={}.{}=============================='.format(i, choice_str))
+    #     #     test(c)

@@ -230,6 +230,9 @@ class TrackerConfig:
     def get_choices_age_node():
         return [(0, 0, 0, 0, a, n) for a in range(10) for n in range(10)]
 
+    @staticmethod
+    def get_ua_choice():
+        return (0, 0, 0, 0, 3, 3)
 class FeatureRecorder:
     '''
     Record features and boxes every frame

@@ -34,7 +34,8 @@ Our network is designed by pytorch framework. It is also trained and tested in U
 ### MOT17
 ### UA-DETRAC
 
-Download all the package in the [official set](http://detrac-db.rit.albany.edu/download) into a folder "ua", which is the root of this dataset. do
+1. Download all the package in the [official set](http://detrac-db.rit.albany.edu/download) into a folder "ua", which is the root of this dataset.
+2. Use "tools/convert_mat_2_ua.py" to convert the DETRAC-Train-Annotations-MAT to the text file
 
 ```shell
 unzip \*.zip
