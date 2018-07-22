@@ -20,7 +20,7 @@ parser.add_argument('--detection_threshold', default=0.3, help='the threshold of
 
 args = parser.parse_args()
 
-def test(choice=None):
+def test(choice=None, sequence_list=None):
     image_root = args.ua_image_root
     detection_root = args.ua_detection_root
     ignore_root = args.ua_ignore_root
@@ -35,15 +35,30 @@ def test(choice=None):
     ==============================
     ''')
 
+    if not sequence_list is None:
+        sequences = np.loadtxt(sequence_list, dtype='str')
+    else:
+        sequences = os.listdir(image_root)
+    sequences_basename = [os.path.basename(s) for s in sequences]
+    # print(sequences_basename)
+    # validation
+    for seq in sequences:
+        if not os.path.exists(os.path.join(image_root, seq)):
+            raise FileNotFoundError()
+
     all_image_folders = sorted(
-        [os.path.join(image_root, d) for d in os.listdir(image_root)]
+        [os.path.join(image_root, d) for d in sequences]
     )
-    all_detection_files = sorted(
-        [os.path.join(detection_root, f) for f in os.listdir(detection_root) if 'MVI_' in f]
-    )
-    all_ignore_files = sorted(
-        [os.path.join(ignore_root, f) for f in os.listdir(ignore_root)]
-    )
+
+    all_detection_files = [os.path.join(detection_root, f+'_Det_EB.txt') for f in sequences_basename]
+    all_ignore_files = [os.path.join(ignore_root, f+'_IgR.txt') for f in sequences_basename]
+    # all_detection_files = sorted(
+    #     [os.path.join(detection_root, f) for f in os.listdir(detection_root) if 'MVI_' in f and os.path.basename(f) in sequences_basename]
+    # )
+    # all_ignore_files = sorted(
+    #     [os.path.join(ignore_root, f) for f in os.listdir(ignore_root) if os.path.basename(f)[:-8] in sequences_basename]
+    # )
+    # print(all_ignore_files)
 
     ignore_file_base_name = [os.path.basename(f)[:-8] for f in all_ignore_files]
     detection_file_base_name = [os.path.basename(f)[:9] for f in all_detection_files]
@@ -133,16 +148,16 @@ def test(choice=None):
 
 if __name__ == '__main__':
     c = TrackerConfig.get_ua_choice()
-    threshold = [i*0.1 for i in range(11)]
+    threshold = [i*0.1 for i in range(10)]
     save_folder = args.save_folder
+    if not os.path.exists(args.save_folder):
+        os.mkdir(args.save_folder)
     for t in threshold:
-        if t == 0.3:
-            continue
         args.detection_threshold = t
-        args.save_folder = os.path.join(save_folder, '{0:0.1f}'.format(0.1))
+        args.save_folder = os.path.join(save_folder, '{0:0.1f}'.format(t))
         if not os.path.exists(args.save_folder):
             os.mkdir(args.save_folder)
-        test(c)
+        test(c, './config/ua_experienced.txt')
 
     # for i in range(10):
     #     #     c = all_choices[-i]
