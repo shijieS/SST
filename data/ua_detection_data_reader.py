@@ -52,7 +52,7 @@ class UADetectionDataReader:
         if mask is not None:
             self.detection = self.detection[np.logical_not(mask)]
 
-        self.detection = self.detection[self.detection.iloc[:, 6] > detection_threshold]
+        self.detection = self.detection[self.detection.iloc[:, 6] >= detection_threshold]
 
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())

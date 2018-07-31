@@ -50,7 +50,7 @@ def test(choice=None, sequence_list=None):
         [os.path.join(image_root, d) for d in sequences]
     )
 
-    all_detection_files = [os.path.join(detection_root, f+'_Det_EB.txt') for f in sequences_basename]
+    all_detection_files = [os.path.join(detection_root, f+'_Det_'+config['detector_name']+'.txt') for f in sequences_basename]
     all_ignore_files = [os.path.join(ignore_root, f+'_IgR.txt') for f in sequences_basename]
     # all_detection_files = sorted(
     #     [os.path.join(detection_root, f) for f in os.listdir(detection_root) if 'MVI_' in f and os.path.basename(f) in sequences_basename]
@@ -73,7 +73,6 @@ def test(choice=None, sequence_list=None):
     saved_file_name_format = os.path.join(save_folder, '{}.txt')
     saved_video_name_format = os.path.join(save_folder, '{}.avi')
 
-    timer = Timer()
     for image_folder in all_image_folders:
         image_folder_base_name = os.path.basename(image_folder)
         i = ignore_file_base_name.index(image_folder_base_name)
@@ -96,7 +95,7 @@ def test(choice=None, sequence_list=None):
         i = 0
         result = list()
         result_str = saved_file_name
-
+        timer = Timer()
         for item in reader:
             i += 1
             if item is None:
@@ -140,15 +139,16 @@ def test(choice=None, sequence_list=None):
                     )
         # save data
         np.savetxt(saved_file_name, np.array(result).astype(int), fmt='%i')
+        np.savetxt(os.path.splitext(saved_file_name)[0]+'-speed.txt', np.array([timer.total_time]), fmt='%.3f')
         print(result_str)
 
-    print(timer.total_time)
-    print(timer.average_time)
+    # print(timer.total_time)
+    # print(timer.average_time)
 
 
 if __name__ == '__main__':
     c = TrackerConfig.get_ua_choice()
-    threshold = [i*0.1 for i in range(10)]
+    threshold = [i*0.1 for i in range(11)]
     save_folder = args.save_folder
     if not os.path.exists(args.save_folder):
         os.mkdir(args.save_folder)

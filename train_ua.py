@@ -137,6 +137,14 @@ def train():
                                   collate_fn=collate_fn,
                                   pin_memory=False)
 
+    # adjust the learning rate
+    print('adjust the learning rate')
+    for iteration in range(args.start_iter):
+        if iteration in stepvalues:
+            step_index += 1
+            current_lr = adjust_learning_rate(optimizer, args.gamma, step_index)
+
+    # start training
     for iteration in range(args.start_iter, max_iter):
         if (not batch_iterator) or (iteration % epoch_size == 0):
             # create batch iterator

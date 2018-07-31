@@ -232,7 +232,7 @@ class TrackerConfig:
 
     @staticmethod
     def get_ua_choice():
-        return (0, 0, 0, 0, 3, 3)
+        return (2, 0, 0, 0, 3, 3)
 class FeatureRecorder:
     '''
     Record features and boxes every frame

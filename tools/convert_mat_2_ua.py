@@ -1,5 +1,6 @@
 '''
-
+author: shijie Sun
+email: shijieSun@chd.edu.cn
 '''
 import argparse
 import os
@@ -10,12 +11,11 @@ print('''
 Usage: convert_mat_2_ua --ua="ua root path"
 ''')
 
-parser = argparse.ArgumentParser(description='Single Shot Joint Tracker Train')
+parser = argparse.ArgumentParser(description='Convert ')
 parser.add_argument('--root', default="/media/jianliu/ssm/dataset/dataset/UA-DETRAC", help='UA-DETRAC data set root directory, such as ua, we will create one directory called gt')
 parser.add_argument('--annotations_mat', default="DETRAC-Train-Annotations-MAT", help='mat folder name')
 
 args = parser.parse_args()
-
 
 class ConvertMat2UA:
     @staticmethod
