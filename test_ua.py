@@ -66,6 +66,7 @@ def test(choice=None, sequence_list=None):
     choice_str = ''
     if not choice is None:
         choice_str =  TrackerConfig.get_configure_str(choice)
+        TrackerConfig.set_configure(c)
         save_folder = os.path.join(args.save_folder, choice_str)
         if not os.path.exists(save_folder):
             os.mkdir(save_folder)

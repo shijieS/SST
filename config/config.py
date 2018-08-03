@@ -7,7 +7,7 @@ configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'init_train_ua'
+current_select_configure = 'init_test_ua'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -279,12 +279,12 @@ all_functions += [init_train_ua]
 
 
 def init_test_ua():
-    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/0721-E25-M80-G30-TestSet-RCNN'
+    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/temp-0803-E25-M80-G30-TestSet-EB'
     config['ua_image_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/Insight-MVT_Annotation_Test'
-    config['ua_detection_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/R-CNN'
+    config['ua_detection_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/EB'
     config['ua_ignore_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/DETRAC-MOT-toolkit/evaluation/igrs'
-    config['resume'] = '/media/ssm/seagate/weights/UA-DETRAC/0621-E25-M80-G30-weight/sst300_0712_104300.pth'
-    config['detector_name'] = 'R-CNN'
+    config['resume'] = '/media/ssm/seagate/weights/UA-DETRAC/0621-0728-E25-M80-G30-weight/sst300_0712_114730.pth'
+    config['detector_name'] = 'EB'
     config['batch_size'] = 1
     config['min_gap_frame'] = 0
     config['max_gap_frame'] = 30
