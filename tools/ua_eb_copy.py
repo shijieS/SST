@@ -11,8 +11,8 @@ Usage: check_ua_result --ua_root="ua root path" --template_root="your template f
 ''')
 
 parser = argparse.ArgumentParser(description='the tools for copy eb files to the specified folders according the sequences list')
-parser.add_argument('--eb_root', default=r"D:\ssj\DETRAC\EB-old", help='the eb folder')
-parser.add_argument('--eb_destination', default=r"D:\ssj\DETRAC\EB-old-select", help='the destination folders')
+parser.add_argument('--eb_root', default=r"D:\ssj\DETRAC\20170721Result\0803-E25-M80-G30-TestSet-EB-UA\EB-Test\EB", help='the eb folder')
+parser.add_argument('--eb_destination', default=r"D:\ssj\DETRAC\20170721Result\0803-E25-M80-G30-TestSet-EB-UA\EB-Test\EBNew", help='the destination folders')
 parser.add_argument('--eb_sequences', default="../config/ua_experienced.txt", help='the destination folders')
 
 

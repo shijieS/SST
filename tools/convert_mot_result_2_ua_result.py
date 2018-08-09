@@ -8,7 +8,7 @@ Usage: convert_mat_2_ua --ua="ua root path"
 
 
 parser = argparse.ArgumentParser(description='UA Result Formatter')
-parser.add_argument('--mot_folder', default=r"D:/ssj/DETRAC/20170721Result/mot",
+parser.add_argument('--mot_folder', default=r"D:\ssj\DETRAC\20170721Result\0805-E25-M80-G30-TestSet-EB-MOT",
                     help='''mot result folder, with the following directory structure:
                     folder
                     |
@@ -16,7 +16,7 @@ parser.add_argument('--mot_folder', default=r"D:/ssj/DETRAC/20170721Result/mot",
                     |-- 0.2
                     |-- ...
                     ''')
-parser.add_argument('--ua_folder', default=r"D:\ssj\DETRAC\20170721Result\detrac", help='ua result folder. This tool would create this folder with same sturcture')
+parser.add_argument('--ua_folder', default=r"D:\ssj\DETRAC\20170721Result\0805-E25-M80-G30-TestSet-EB-UA", help='ua result folder. This tool would create this folder with same sturcture')
 
 args = parser.parse_args()
 
@@ -36,7 +36,8 @@ class ConvertTools:
         path00 = os.path.join(mot_folder, '0.0')
         files00 = os.listdir(path00)
         for f in files00:
-            frame_number[os.path.splitext(f)[0]] = max(np.loadtxt(os.path.join(path00, f), dtype=int)[:, 0])
+            if 'speed' not in f:
+                frame_number[os.path.splitext(f)[0]] = max(np.loadtxt(os.path.join(path00, f), dtype=int)[:, 0])
 
 
 
@@ -49,14 +50,28 @@ class ConvertTools:
                 os.mkdir(ua_threshold_folder)
             # list all the files
             files = [os.path.join(folder, f) for f in os.listdir(folder)]
-            files = list(filter(lambda f: os.path.isfile(f), files))
+            files = sorted(list(filter(lambda f: os.path.isfile(f) and 'speed' not in os.path.basename(f), files)))
             for file in files:
                 print('process: {}====>'.format(file))
+                ua_file = os.path.join(ua_threshold_folder, os.path.splitext(os.path.basename(file))[0]) + "_{}.txt"
                 data = np.loadtxt(file, dtype=int)
+                if len(data) == 0:
+                    np.savetxt(ua_file.format('LX'), [], fmt='%i')
+                    np.savetxt(ua_file.format('LY'), [], fmt='%i', )
+                    np.savetxt(ua_file.format('W'), [], fmt='%i')
+                    np.savetxt(ua_file.format('H'), [], fmt='%i')
+                    np.savetxt(ua_file.format('speed'), [], fmt='%f')
+                    continue
+
                 data[:, 0] = data[:, 0] - 1
                 data[:, 1] = data[:, 1] - 1
                 # max_f = max(data[:, 0])+1
                 max_f = frame_number[os.path.splitext(os.path.basename(file))[0]]
+                time = np.loadtxt(os.path.splitext(file)[0]+'-speed.txt', dtype=float)
+                if time == 0:
+                    speed = 0
+                else:
+                    speed = max_f / time
                 max_id = max(data[:, 1])+1
                 ua_data_LX = np.zeros((max_f, max_id), dtype=int)
                 ua_data_LY = np.zeros((max_f, max_id), dtype=int)
@@ -70,13 +85,17 @@ class ConvertTools:
                     ua_data_LY[r, c] = row[3]
                     ua_data_W[r, c] = row[4]
                     ua_data_H[r, c] = row[5]
+                if len(data) > 1:
+                    ua_data_LX[0, :] = ua_data_LX[1, :]
+                    ua_data_LY[0, :] = ua_data_LY[1, :]
+                    ua_data_W[0, :] = ua_data_W[1, :]
+                    ua_data_H[0, :] = ua_data_H[1, :]
 
-                ua_file = os.path.join(ua_threshold_folder, os.path.splitext(os.path.basename(file))[0])+"_{}.txt"
                 np.savetxt(ua_file.format('LX'), ua_data_LX, fmt='%i')
                 np.savetxt(ua_file.format('LY'), ua_data_LY, fmt='%i', )
                 np.savetxt(ua_file.format('W'), ua_data_W, fmt='%i')
                 np.savetxt(ua_file.format('H'), ua_data_H, fmt='%i')
-                np.savetxt(ua_file.format('speed'), [max_f/(6+np.random.rand())], fmt='%f')
+                np.savetxt(ua_file.format('speed'), [speed], fmt='%f')
 
         # save sequence name file
         sequenceNames = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(threshold_folder[0])]

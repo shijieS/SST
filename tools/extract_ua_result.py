@@ -5,13 +5,13 @@ import scipy.io as scio
 import numpy as np
 
 print('''
-Usage: convert_mat_2_ua --ua="ua root path"
+Usage: extract_ua_result
 ''')
 
 parser = argparse.ArgumentParser(description='the tools for extract txt file from result')
-parser.add_argument('--result_root', default="/media/ssm/seagate/weights/UA-DETRAC/0721-E25-M80-G30-TestSet-test", help='folder with result files')
-parser.add_argument('--configure_str', default="0_0_0_0_3_3", help="The configure string")
-parser.add_argument('--save_folder', default="/media/ssm/seagate/weights/UA-DETRAC/0721-E25-M80-G30-TestSet-format", help='folder which needed to be extracted to')
+parser.add_argument('--result_root', default="/media/ssm/seagate/weights/UA-DETRAC/0805-E25-M80-G30-TestSet-EB", help='folder with result files')
+parser.add_argument('--configure_str', default="5_0_4_1_5_5", help="The configure string")
+parser.add_argument('--save_folder', default="/media/ssm/seagate/weights/UA-DETRAC/0805-E25-M80-G30-TestSet-EB-MOT", help='folder which needed to be extracted to')
 
 
 args = parser.parse_args()
