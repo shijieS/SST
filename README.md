@@ -205,7 +205,7 @@ PYTHONPAHT=. python train_kitti.py
 <!--The result and accuracy is shown below:-->
 <!--![](image/training20180410.png)-->
 <!--![](image/accuracy20180410.png)-->
-<!--> we find that if we decrease the learning or keep it as 1e-3, we get get better result.-->
+<!-- we find that if we decrease the learning or keep it as 1e-3, we get get better result.-->
 
-<!--> We also find that it's so hard to matching cars even for human being when the frame gap is 30-->
+<!-- We also find that it's so hard to matching cars even for human being when the frame gap is 30-->
 <!--![](image/hardwhen30framegap.png)-->
