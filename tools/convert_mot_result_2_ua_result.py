@@ -85,11 +85,11 @@ class ConvertTools:
                     ua_data_LY[r, c] = row[3]
                     ua_data_W[r, c] = row[4]
                     ua_data_H[r, c] = row[5]
-                if len(data) > 1:
-                    ua_data_LX[0, :] = ua_data_LX[1, :]
-                    ua_data_LY[0, :] = ua_data_LY[1, :]
-                    ua_data_W[0, :] = ua_data_W[1, :]
-                    ua_data_H[0, :] = ua_data_H[1, :]
+                # if len(data) > 1:
+                #     ua_data_LX[0, :] = ua_data_LX[1, :]
+                #     ua_data_LY[0, :] = ua_data_LY[1, :]
+                #     ua_data_W[0, :] = ua_data_W[1, :]
+                #     ua_data_H[0, :] = ua_data_H[1, :]
 
                 np.savetxt(ua_file.format('LX'), ua_data_LX, fmt='%i')
                 np.savetxt(ua_file.format('LY'), ua_data_LY, fmt='%i', )
