@@ -55,39 +55,7 @@ Our final result is based on two mot dataset [MOT17](https://motchallenge.net/da
 unzip \*.zip
 ```
 
-
-# Train
-We provide a convient way to train the network. Currently, MOT dataset, KITTI dataset is supported.
-## MOT
-- Go to the root folder of this project
-- In config/config.py, change the configure in function init_train_mot() and decomment the code as follows:
- ```python
-    init_train_kitti()
- ```
-- Run the following command
-```python
-PYTHONPAHT=. python train_kitti.py
-```
-
-## KITTI
-- Go to the root folder of this project
-- In config/config.py, change the configure in function init_train_kitti() and decomment the code as follows:
- ```python
-    init_train_kitti()
- ```
-- Run the following command
-```python
-PYTHONPAHT=. python train_kitti.py
-```
-
-# Test
-Similar to the train, we also provide a convient way to test the network. Currently only support MOT dataset, KITTI dataset.
-
 ## Testing
-
-
-## Training
-
 ### MOT17
 - Go to the project folder
 - In config/config.py, change the configure in function init_test_mot() and decommend the code as follows:
@@ -113,6 +81,29 @@ PYTHONPATH=. python test_mot.py
 PYTHONPATH=. python test_kitti.py
 ```
 
+## Training
+We provide a convient way to train the network. Currently, MOT dataset, KITTI dataset is supported.
+## MOT
+- Go to the root folder of this project
+- In config/config.py, change the configure in function init_train_mot() and decomment the code as follows:
+ ```python
+    init_train_kitti()
+ ```
+- Run the following command
+```python
+PYTHONPAHT=. python train_kitti.py
+```
+
+## KITTI
+- Go to the root folder of this project
+- In config/config.py, change the configure in function init_train_kitti() and decomment the code as follows:
+ ```python
+    init_train_kitti()
+ ```
+- Run the following command
+```python
+PYTHONPAHT=. python train_kitti.py
+```
 
 ## CopyRight
 
