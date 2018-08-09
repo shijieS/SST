@@ -279,7 +279,7 @@ all_functions += [init_train_ua]
 
 
 def init_test_ua():
-    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/0805-E25-M80-G30-TestSet-EB'
+    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/temp-0809-E25-M80-G30-TestSet-EB'
     config['ua_image_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/Insight-MVT_Annotation_Test'
     config['ua_detection_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/EB'
     config['ua_ignore_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/DETRAC-MOT-toolkit/evaluation/igrs'

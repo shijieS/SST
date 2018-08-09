@@ -75,5 +75,5 @@ class UADetectionDataReader:
     def __getitem__(self, item):
         if item >= self.length:
             raise IndexError()
-        return (self.get_image_by_index(item),
-                self.get_detection_by_index(item))
+        return (self.get_image_by_index(item+1),
+                self.get_detection_by_index(item+1))

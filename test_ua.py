@@ -93,12 +93,10 @@ def test(choice=None, sequence_list=None):
         tracker = SSTTracker()
         reader = UADetectionDataReader(image_folder, detection_file, ignore_file if args.use_ignore else None,
                                        args.detection_threshold)
-        i = 0
         result = list()
         result_str = saved_file_name
         timer = Timer()
-        for item in reader:
-            i += 1
+        for i, item in enumerate(reader):
             if item is None:
                 continue
 
@@ -119,7 +117,7 @@ def test(choice=None, sequence_list=None):
             det[:, [3, 5]] /= float(h)
 
             timer.tic()
-            image_org = tracker.update(img, det[:, 2:6], args.show_image)
+            image_org = tracker.update(img, det[:, 2:6], args.show_image, i)
             timer.toc()
             if i % 20 == 0:
                 print('{}:{}, {}, {}, {}\r'.format(saved_file_name, i, int(i * 100 / reader.length), choice_str, args.detection_threshold))
@@ -136,10 +134,10 @@ def test(choice=None, sequence_list=None):
                 if t.age == 1:
                     b = n.get_box(tracker.frame_index-1, tracker.recorder)
                     result.append(
-                        [i] + [t.id] + [b[0]*w, b[1]*h, b[2]*w, b[3]*h] + [-1, -1, -1, -1]
+                        [i+1] + [t.id+1] + [b[0]*w, b[1]*h, b[2]*w, b[3]*h] + [-1, -1, -1, -1]
                     )
         # save data
-        np.savetxt(saved_file_name, np.array(result).astype(int), fmt='%i')
+        np.savetxt(saved_file_name, np.array(result).astype(int), fmt='%d %d %1.2f %1.2f %1.2f %1.2f %d %d %d %d')
         np.savetxt(os.path.splitext(saved_file_name)[0]+'-speed.txt', np.array([timer.total_time]), fmt='%.3f')
         print(result_str)
 

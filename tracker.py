@@ -367,7 +367,7 @@ class Track:
     4) age. age indicates how old is the track
     5) max_age. indicates the dead age of this track
     '''
-    _id_pool = 1
+    _id_pool = 0
 
     def __init__(self):
         self.nodes = list()
@@ -557,7 +557,7 @@ class Tracks:
 # The tracker is compatible with pytorch (cuda)
 class SSTTracker:
     def __init__(self):
-        Track._id_pool = 1
+        Track._id_pool = 0
         self.first_run = True
         self.image_size = TrackerConfig.image_size
         self.model_path = TrackerConfig.sst_model_path
@@ -580,7 +580,7 @@ class SSTTracker:
             self.sst.load_state_dict(torch.load(config['resume'], map_location='cpu'))
         self.sst.eval()
 
-    def update(self, image, detection, show_image):
+    def update(self, image, detection, show_image, frame_index):
         '''
         Update the state of tracker, the following jobs should be done:
         1) extract the features
@@ -591,6 +591,8 @@ class SSTTracker:
         :param image: the opencv readed image, format is hxwx3
         :param detections: detection array. numpy array (l, r, w, h) and they all formated in (0, 1)
         '''
+
+        self.frame_index = frame_index
 
         # format the image and detection
         h, w, _ = image.shape
@@ -612,7 +614,7 @@ class SSTTracker:
                 t.add_node(self.frame_index, self.recorder, n)
                 self.tracks.append(t)
             self.tracks.one_frame_pass()
-            self.frame_index += 1
+            # self.frame_index += 1
             return
 
         # get tracks similarity
@@ -673,10 +675,10 @@ class SSTTracker:
 
         if show_image:
             image_org = self.tracks.show(self.frame_index, self.recorder, image_org)
-            self.frame_index += 1
+            # self.frame_index += 1
             return image_org
 
-        self.frame_index += 1
+        # self.frame_index += 1
         # image_org = cv2.resize(image_org, (320, 240))
         # vw.write(image_org)
 
