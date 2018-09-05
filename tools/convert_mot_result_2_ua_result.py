@@ -8,7 +8,7 @@ Usage: convert_mat_2_ua --ua="ua root path"
 
 
 parser = argparse.ArgumentParser(description='UA Result Formatter')
-parser.add_argument('--mot_folder', default=r"D:\ssj\DETRAC\20170721Result\0805-E25-M80-G30-TestSet-EB-MOT",
+parser.add_argument('--mot_folder', default=r"D:\ssj\DETRAC\20170721Result\0812-E25-M80-G30-TestSet-EB-MOT",
                     help='''mot result folder, with the following directory structure:
                     folder
                     |
@@ -16,7 +16,7 @@ parser.add_argument('--mot_folder', default=r"D:\ssj\DETRAC\20170721Result\0805-
                     |-- 0.2
                     |-- ...
                     ''')
-parser.add_argument('--ua_folder', default=r"D:\ssj\DETRAC\20170721Result\0805-E25-M80-G30-TestSet-EB-UA", help='ua result folder. This tool would create this folder with same sturcture')
+parser.add_argument('--ua_folder', default=r"D:\ssj\DETRAC\20170721Result\0812-E25-M80-G30-TestSet-EB-UA", help='ua result folder. This tool would create this folder with same sturcture')
 
 args = parser.parse_args()
 
@@ -62,6 +62,8 @@ class ConvertTools:
                     np.savetxt(ua_file.format('H'), [], fmt='%i')
                     np.savetxt(ua_file.format('speed'), [], fmt='%f')
                     continue
+                if len(data.shape) == 1:
+                    data = np.expand_dims(data, axis=0)
 
                 data[:, 0] = data[:, 0] - 1
                 data[:, 1] = data[:, 1] - 1

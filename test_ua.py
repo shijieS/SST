@@ -15,7 +15,7 @@ parser.add_argument('--ua_ignore_root', default=config['ua_ignore_root'], help='
 parser.add_argument('--save_folder', default=config['save_folder'], help='save file folder Root')
 parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=True, help='save video if true')
-parser.add_argument('--use_ignore', default=True, help='use ignore or not')
+parser.add_argument('--use_ignore', default=False, help='use ignore or not')
 parser.add_argument('--detection_threshold', default=0.3, help='the threshold of detection')
 
 args = parser.parse_args()
@@ -137,7 +137,11 @@ def test(choice=None, sequence_list=None):
                         [i+1] + [t.id+1] + [b[0]*w, b[1]*h, b[2]*w, b[3]*h] + [-1, -1, -1, -1]
                     )
         # save data
-        np.savetxt(saved_file_name, np.array(result).astype(int), fmt='%d %d %1.2f %1.2f %1.2f %1.2f %d %d %d %d')
+        if len(result) > 0 :
+            save_format = '%d %d %1.2f %1.2f %1.2f %1.2f %d %d %d %d'
+        else:
+            save_format = '%i'
+        np.savetxt(saved_file_name, np.array(result).astype(int), fmt=save_format)
         np.savetxt(os.path.splitext(saved_file_name)[0]+'-speed.txt', np.array([timer.total_time]), fmt='%.3f')
         print(result_str)
 

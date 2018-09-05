@@ -232,6 +232,7 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
     batch_size = img_pre.shape[0]
     images = list()
     h = config['sst_dim']
+    gap = 20 / config['sst_dim']
     for i in range(batch_size):
         img1 = img_pre[i, :].permute(1, 2, 0).data
         img1 = img1.cpu().numpy() + config['mean_pixel']
@@ -251,15 +252,20 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
 
         # draw all circle
         for b in boxes1:
-            img1 = cv2.circle(img1, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [255, 0, 0],
+            img1 = cv2.circle(img1, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [0, 0, 255],
                               thickness=3)
 
         for b in boxes2:
-            img2 = cv2.circle(img2, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [255, 0, 0],
+            img2 = cv2.circle(img2, tuple(((b + 1) / 2.0 * config['sst_dim']).astype(int)), 20, [0, 0, 255],
                               thickness=3)
 
+        gap_pixel = int(gap * config["sst_dim"])
+        H, W, C = img1.shape
+        img = np.ones((2*H+gap_pixel, W, C), dtype=np.uint8)*255
+        img[:H, :W, :] = img1
+        img[gap_pixel+H:, :] = img2
         # connect the boxes
-        img = np.concatenate([img1, img2], axis=0)
+        # img = np.concatenate([img1, img2], axis=0)
 
         # draw the connected boxes
         for j, b1 in enumerate(boxes1):
@@ -270,7 +276,7 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
             start_pt = tuple(((b1 + 1) / 2.0 * config['sst_dim']).astype(int))
             b2 = boxes_next[i, :, 0, 0, :].data.cpu().numpy()[index[j]]
             end_pt = tuple(((b2 + 1) / 2.0 * config['sst_dim']).astype(int))
-            end_pt = (end_pt[0], end_pt[1]+h)
+            end_pt = (end_pt[0], end_pt[1]+h+gap_pixel)
             img = cv2.circle(img, start_pt, 20, color, thickness=3)
             img = cv2.circle(img, end_pt, 20, color, thickness=3)
             img = cv2.line(img, start_pt, end_pt, color, thickness=3)
@@ -278,7 +284,8 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
         if 'save_images_folder' in config and iteration!=-1:
             cv2.imwrite(os.path.join(config['save_images_folder'], '{0:06}.png'.format(iteration)), img)
 
-        img = torch.from_numpy(img.astype(np.float) - config['mean_pixel']).permute(2, 0, 1)
+        # img = torch.from_numpy(img.astype(np.float) - config['mean_pixel']).permute(2, 0, 1)
+        img = torch.from_numpy(img.astype(np.float)).permute(2, 0, 1)
         images.append(img)
     return torch.stack(images, dim=0)
 

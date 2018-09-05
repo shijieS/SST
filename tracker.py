@@ -178,6 +178,7 @@ class TrackerConfig:
     @staticmethod
     def set_configure(all_choice):
         min_iou_frame_gaps = [
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -186,6 +187,7 @@ class TrackerConfig:
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
             ]
         min_ious = [
+            [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
             [0.3, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0],
             [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
@@ -673,10 +675,10 @@ class SSTTracker:
         # if self.frame_index % 20 == 0:
         #     self.tracks.merge(self.frame_index, self.recorder)
 
-        if show_image:
-            image_org = self.tracks.show(self.frame_index, self.recorder, image_org)
-            # self.frame_index += 1
-            return image_org
+        # if show_image:
+        image_org = self.tracks.show(self.frame_index, self.recorder, image_org)
+        # self.frame_index += 1
+        return image_org
 
         # self.frame_index += 1
         # image_org = cv2.resize(image_org, (320, 240))

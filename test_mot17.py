@@ -13,7 +13,7 @@ parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
 parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=False, help='save video if true')
+parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
@@ -63,12 +63,10 @@ def test(choice=None):
         tracker = SSTTracker()
         reader = MOTDataReader(image_folder = image_folder,
                       detection_file_name =detection_file_name)
-        i = 0
         result = list()
         result_str = saved_file_name
 
-        for item in reader:
-            i += 1
+        for i, item in enumerate(reader):
             if i > len(reader):
                 break
 
@@ -92,7 +90,7 @@ def test(choice=None):
             det[:, [2,4]] /= float(w)
             det[:, [3,5]] /= float(h)
             timer.tic()
-            image_org = tracker.update(img, det[:, 2:6], args.show_image)
+            image_org = tracker.update(img, det[:, 2:6], args.show_image, i)
             timer.toc()
             print('{}:{}, {}, {}\r'.format(os.path.basename(saved_file_name), i, int(i*100/len(reader)), choice_str))
             if args.show_image and not image_org is None:
@@ -125,7 +123,7 @@ if __name__ == '__main__':
     i = 0
     for age in range(10):
         for node in range(10):
-            c = (0, 0, 0, 0, age, node)
+            c = (0, 0, 0, 0, 5, 5)
             choice_str = TrackerConfig.get_configure_str(c)
             TrackerConfig.set_configure(c)
             print('=============================={}.{}=============================='.format(i, choice_str))
