@@ -9,7 +9,7 @@ import torch.utils.data as data
 import numpy as np
 import argparse
 
-from data.mot import MOTTrainDataset
+from data.ua import UATrainDataset
 from config.config import config
 from layer.sst import build_sst
 from layer.sst_loss import SSTLoss
@@ -29,11 +29,12 @@ else:
 sst.eval()
 
 
-dataset = MOTTrainDataset(config['mot_root'],
-                          SSJEvalAugment(
+dataset = UATrainDataset(config['ua_image_root'],
+                         config['ua_detection_root'],
+                         config['ua_ignore_root'],
+                         SSJEvalAugment(
                              config['sst_dim'], config['mean_pixel']
-                         )
-                         )
+                         ))
 
 data_loader = data.DataLoader(dataset, config['batch_size'],
                               num_workers=config['num_workers'],

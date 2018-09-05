@@ -3,7 +3,8 @@ import json
 
 configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'init_train_kitti', 'init_test_kitti',
-                   'init_train_ua', 'init_test_ua'
+                   'init_train_ua', 'init_test_ua',
+                   'exp_init_train_ua', 'exp_init_test_ua',
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
@@ -291,6 +292,15 @@ def init_test_ua():
     config['cuda'] = True
     config['max_object'] = 80
     config['type'] = 'train'
+
+def exp_init_test_ua():
+    config['save_folder']
+    config['ua_image_root']
+    config['ua_detection_root']
+    config['ua_ignore_root']
+    config['resume']
+    config['detector_name']
+    config['min_gap_frame']
 
 all_functions += [init_test_ua]
 
