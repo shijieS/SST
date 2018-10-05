@@ -6,9 +6,9 @@ print('''
 Usage: comm_split_frames_from_video --ua="ua root path"
 ''')
 parser = argparse.ArgumentParser(description='Split Frames from video')
-parser.add_argument('--video_path', default=r"D:\ssj\temp\MOT17-14-FRCNN-SST.mp4",
+parser.add_argument('--video_path', default=r"D:\ssj\temp\video\MVI_40855.avi",
                     help="input video path")
-parser.add_argument('--output_folder', default=r"D:\ssj\temp\MOT17-14-FRCNN-SST", help="output folder")
+parser.add_argument('--output_folder', default=r"D:\ssj\temp\video\MVI_40855", help="output folder")
 
 args = parser.parse_args()
 if not os.path.exists(args.video_path):

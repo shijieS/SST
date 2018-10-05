@@ -178,7 +178,7 @@ class TrackerConfig:
     @staticmethod
     def set_configure(all_choice):
         min_iou_frame_gaps = [
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -187,7 +187,7 @@ class TrackerConfig:
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
             ]
         min_ious = [
-            [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
+            # [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
             [0.3, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0],
             [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
@@ -534,7 +534,7 @@ class Tracks:
                 b = t.nodes[-1].get_box(frame_index, recorder)
                 if b is None:
                     continue
-                image = cv2.putText(image, str(t.id), (int(b[0]*w),int((b[1])*h)), cv2.FONT_HERSHEY_SIMPLEX, 1, t.color, 3)
+                # image = cv2.putText(image, str(t.id), (int(b[0]*w),int((b[1])*h)), cv2.FONT_HERSHEY_SIMPLEX, 1, t.color, 3)
                 image = cv2.rectangle(image, (int(b[0]*w),int((b[1])*h)), (int((b[0]+b[2])*w), int((b[1]+b[3])*h)), t.color, 2)
 
         # draw line
@@ -552,7 +552,7 @@ class Tracks:
                     continue
                 c1 = (int((b1[0] + b1[2]/2.0)*w), int((b1[1] + b1[3])*h))
                 c2 = (int((b2[0] + b2[2] / 2.0) * w), int((b2[1] + b2[3]) * h))
-                image = cv2.line(image, c1, c2, t.color, 2)
+                # image = cv2.line(image, c1, c2, t.color, 2)
 
         return image
 

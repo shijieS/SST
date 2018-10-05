@@ -2,6 +2,17 @@
 ## Purpose
 SST is an end-to-end deep learning network during train phase, whose purpose is to extracted object feature along with its surrounding's feature and output a similarity matrix to indicate the similarity of boxes from different frames.
 
+> Note: 
+
+## Network Framework
+
+![](./image/network.png)
+
+| Name   | Function                                                     |
+| ------ | ------------------------------------------------------------ |
+| Input  | - two images (with any interval frame)<br/> - center of detected boxes <br> - matching matrix of detected boxes |
+| Output | - Features of detected boxes <br> - Similarity matrix of detected boxes |
+
 ## Task
 ### Current Task
 
@@ -29,15 +40,25 @@ Designing network   | 2017/10           | 2017/10       | Designing the network 
 Start the project   | 2017/10           | 2017/10       | This idea is based on SSD             |   Finish      |
 
 ## Requirement
-Our network and framework is based on cuda 8.0 and python 3.5.
+The requirement as follows:
 
-After install cuda 8.0, get into the project folder, and run the following shell code.
+| Name    | Version |
+| ------- | ------- |
+| cuda    | 8.0     |
+| python  | 3.5     |
+| pytorch | 0.3.1   |
+
+
+
+The python package installation script as follows:
 
 ```shell
+cd <project path>
 pip install -r requirement.txt
 ```
 
 ## Dataset
+
 Our final result is based on two mot dataset [MOT17](https://motchallenge.net/data/MOT17/) and [UA-DETRAC](https://detrac-db.rit.albany.edu/). MOT 17 is focusing on tracking pedestrian, while UA-DETRAC is focusing on tracking vehicles.
 
 ### MOT17

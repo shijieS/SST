@@ -82,5 +82,3 @@ for i in range(len(dataset)):
     result_image = result_image[0, :].permute(1, 2, 0).cpu().numpy()
     cv2.imwrite(image_format.format(i), result_image)
     print(i)
-
-

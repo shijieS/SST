@@ -14,8 +14,8 @@ Usage: ua_show_result --image_root="ua image root" --result_root="your ua result
 ''')
 
 parser = argparse.ArgumentParser(description='based on your ua result to draw the image')
-parser.add_argument('--image_root', default=r"/media/ssm/seagate/dataset/UA-DETRAC/Insight-MVT_Annotation_Test", help='the eb folder')
-parser.add_argument('--result_root', default=r"/media/ssm/seagate/weights/UA-DETRAC/0803-E25-M80-G30-TestSet-EB-UA/0.1", help='the destination folders')
+parser.add_argument('--image_root', default=r"F:\dataset\dataset\UA-DETRAC\Insight-MVT_Annotation_Test", help='the image folder')
+parser.add_argument('--result_root', default=r"F:\dataset\dataset\UA-DETRAC\other-methods-result\Tracker-joint-det-track-id\Tracker-joint-det-track-id\Detector-joint-det-track-id\0.0", help='the destination folders')
 
 
 args = parser.parse_args()
@@ -40,10 +40,10 @@ for n in names:
     file_LX = os.path.join(args.result_root, n + '_LX.txt')
     file_LY = os.path.join(args.result_root, n + '_LY.txt')
 
-    data_H = np.loadtxt(file_H, dtype=int)
-    data_W = np.loadtxt(file_W, dtype=int)
-    data_LX = np.loadtxt(file_LX, dtype=int)
-    data_LY = np.loadtxt(file_LY, dtype=int)
+    data_H = np.loadtxt(file_H, dtype=int, delimiter=',')
+    data_W = np.loadtxt(file_W, dtype=int, delimiter=',')
+    data_LX = np.loadtxt(file_LX, dtype=int, delimiter=',')
+    data_LY = np.loadtxt(file_LY, dtype=int, delimiter=',')
 
     max_frame = len(data_H)
 
