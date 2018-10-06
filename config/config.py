@@ -2,7 +2,7 @@ import numpy as np
 import json
 
 configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
-                   'init_train_mot15', 'init_test_mot15',
+                   'init_train_mot15', 'init_test_mot15', 'init_test_mot15_train_dataset',
                    'init_train_kitti', 'init_test_kitti',
                    'init_train_ua', 'init_test_ua',
                    'exp_init_train_ua', 'exp_init_test_ua',
@@ -241,7 +241,7 @@ all_functions += [init_train_mot15]
 def init_test_mot15():
     config['resume'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-weights/sst300_0712_83000.pth'
     config['mot_root'] = '/media/ssm/seagate/dataset/MOT15/2DMOT2015'
-    config['log_folder'] = '/media/ssm/seagate/logs/1005-mot15-test'
+    config['log_folder'] = '/media/ssm/seagate/logs/1005-mot15-test-3'
     config['batch_size'] = 1
     config['write_file'] = True
     config['tensorboard'] = True
@@ -250,9 +250,25 @@ def init_test_mot15():
     config['dataset_type'] = 'test'
     config['video_name_list'] = ['ADL-Rundle-1', 'ADL-Rundle-3', 'AVG-TownCentre', 'ETH-Crossing', 'ETH-Jelmoli',
                                  'ETH-Linthescher', 'KITTI-16', 'KITTI-19', 'PETS09-S2L2', 'TUD-Crossing', 'Venice-1']
-
-
 all_functions += [init_test_mot15]
+
+
+def init_test_mot15_train_dataset():
+    config['resume'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-weights/sst300_0712_83000.pth'
+    config['mot_root'] = '/media/ssm/seagate/dataset/MOT15/2DMOT2015'
+    config['log_folder'] = '/media/ssm/seagate/logs/1005-mot15-test-train-dataset-1'
+    config['batch_size'] = 1
+    config['write_file'] = True
+    config['tensorboard'] = True
+    config['save_combine'] = False
+    config['type'] = 'train'
+    config['dataset_type'] = 'train'
+    config['video_name_list'] = ['ADL-Rundle-6',  'ADL-Rundle-8',  'ETH-Bahnhof',  'ETH-Pedcross2',  'ETH-Sunnyday',  'KITTI-13',
+                                 'KITTI-17',  'PETS09-S2L1',  'TUD-Campus',  'TUD-Stadtmitte',  'Venice-2']
+    # config['video_name_list'] = ['KITTI-13']
+
+all_functions += [init_test_mot15_train_dataset]
+
 
 def init_train_kitti():
     config['kitti_image_root'] = '/home/ssm/ssj/dataset/KITTI/tracking/image_2'

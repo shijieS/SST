@@ -582,7 +582,7 @@ class SSTTracker:
             self.sst.load_state_dict(torch.load(config['resume'], map_location='cpu'))
         self.sst.eval()
 
-    def update(self, image, detection, show_image, frame_index):
+    def update(self, image, detection, show_image, frame_index, force_init=False):
         '''
         Update the state of tracker, the following jobs should be done:
         1) extract the features
@@ -609,7 +609,7 @@ class SSTTracker:
         # update recorder
         self.recorder.update(self.sst, self.frame_index, features.data, detection_org)
 
-        if self.frame_index == 0:
+        if self.frame_index == 0 or force_init or len(self.tracks.tracks) == 0:
             for i in range(detection.shape[1]):
                 t = Track()
                 n = Node(self.frame_index, i)
