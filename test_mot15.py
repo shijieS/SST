@@ -37,7 +37,14 @@ def test(choice=None):
     save_file_name_format = os.path.join(save_folder, '{}.txt')
     save_video_name_format = os.path.join(save_folder, '{}.avi')
     timer = Timer()
+
     for video_name in video_name_list:
+        if video_name == 'AVG-TownCentre':
+            TrackerConfig.set_configure((4, 0, 4, 4, 5, 4))
+        else:
+            TrackerConfig.set_configure(choice)
+
+
         mot_root = os.path.join(config['mot_root'], config['dataset_type'])
         mot_root = os.path.join(mot_root, video_name)
         image_folder = os.path.join(mot_root, 'img1')

@@ -177,6 +177,7 @@ class TrackerConfig:
 
     @staticmethod
     def set_configure(all_choice):
+
         min_iou_frame_gaps = [
             # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -192,7 +193,7 @@ class TrackerConfig:
             [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
-            [0.0, 0.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0, -7.0],
+            [-1.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0],
             [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
         ]
 
@@ -205,6 +206,8 @@ class TrackerConfig:
         max_track_ages = [i*3 for i in range(1,11)]
         max_track_nodes = [i*3 for i in range(1,11)]
 
+        if all_choice is None:
+            return
         TrackerConfig.min_iou_frame_gap = min_iou_frame_gaps[all_choice[0]]
         TrackerConfig.min_iou = min_ious[all_choice[0]]
         TrackerConfig.decay = decays[all_choice[1]]

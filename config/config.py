@@ -9,7 +9,7 @@ configure_names = ['init_test_mot16', 'init_test_mot17', 'init_train_mot17',
                    'exp_test_mot17_final_net', 'exp_train_mot17_final_net',
                    'init_train_mot17_final_net_lab', 'exp_test_mot17_final_net']
 
-current_select_configure = 'init_test_mot15'
+current_select_configure = 'exp_test_mot17_final_net'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -167,9 +167,9 @@ all_functions += [exp_train_mot17_final_net]
 
 
 def exp_test_mot17_final_net():
-    config['resume'] = '/media/jianliu/Data/ssj/weights/mot17/sst300_0712_83000.pth'
+    config['resume'] = './sst300_0712_83000.pth'
     config['mot_root'] = '/media/jianliu/Data/ssj/dataset/MOT17'
-    config['log_folder'] = '/media/jianliu/Data/ssj/logs/sst/log0903-0'
+    config['log_folder'] = '/media/jianliu/Data/ssj/logs/sst/log0903-1'
     config['batch_size'] = 1
     config['write_file'] = True
     config['tensorboard'] = True
@@ -241,7 +241,7 @@ all_functions += [init_train_mot15]
 def init_test_mot15():
     config['resume'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-weights/sst300_0712_83000.pth'
     config['mot_root'] = '/media/ssm/seagate/dataset/MOT15/2DMOT2015'
-    config['log_folder'] = '/media/ssm/seagate/logs/1005-mot15-test-3'
+    config['log_folder'] = '/media/ssm/seagate/logs/1005-mot15-test-5'
     config['batch_size'] = 1
     config['write_file'] = True
     config['tensorboard'] = True
@@ -341,7 +341,7 @@ all_functions += [init_train_ua]
 
 
 def init_test_ua():
-    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/0812-E25-M80-G30-TestSet-EB'
+    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/1006-E25-M80-G30-TestSet-EB-1'
     config['ua_image_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/Insight-MVT_Annotation_Test'
     config['ua_detection_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/EB'
     config['ua_ignore_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/DETRAC-MOT-toolkit/evaluation/igrs'
