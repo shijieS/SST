@@ -400,7 +400,8 @@ class Track:
             delta_frame = frame_index - n.frame_index
             if delta_frame in TrackerConfig.min_iou_frame_gap:
                 iou_index = TrackerConfig.min_iou_frame_gap.index(delta_frame)
-                if iou < TrackerConfig.min_iou[iou_index]:
+                # if iou < TrackerConfig.min_iou[iou_index]:
+                if iou < TrackerConfig.min_iou[-1]:
                     return False
         self.nodes.append(node)
         self.reset_age()
@@ -537,7 +538,8 @@ class Tracks:
                 b = t.nodes[-1].get_box(frame_index, recorder)
                 if b is None:
                     continue
-                # image = cv2.putText(image, str(t.id), (int(b[0]*w),int((b[1])*h)), cv2.FONT_HERSHEY_SIMPLEX, 1, t.color, 3)
+                txt = '({}, {})'.format(t.id, t.nodes[-1].id)
+                image = cv2.putText(image, txt, (int(b[0]*w),int((b[1])*h)), cv2.FONT_HERSHEY_SIMPLEX, 1, t.color, 3)
                 image = cv2.rectangle(image, (int(b[0]*w),int((b[1])*h)), (int((b[0]+b[2])*w), int((b[1]+b[3])*h)), t.color, 2)
 
         # draw line
@@ -555,7 +557,7 @@ class Tracks:
                     continue
                 c1 = (int((b1[0] + b1[2]/2.0)*w), int((b1[1] + b1[3])*h))
                 c2 = (int((b2[0] + b2[2] / 2.0) * w), int((b2[1] + b2[3]) * h))
-                # image = cv2.line(image, c1, c2, t.color, 2)
+                image = cv2.line(image, c1, c2, t.color, 2)
 
         return image
 
@@ -620,7 +622,7 @@ class SSTTracker:
                 self.tracks.append(t)
             self.tracks.one_frame_pass()
             # self.frame_index += 1
-            return
+            return self.tracks.show(self.frame_index, self.recorder, image_org)
 
         # get tracks similarity
         y, ids = self.tracks.get_similarity(self.frame_index, self.recorder)
