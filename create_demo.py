@@ -74,13 +74,12 @@ def create(c):
             #                             (0, 0, 0), 2)
             cv2.imshow('res', image_org)
             cv2.imwrite(os.path.join(args.log_folder, '{0:06}.jpg'.format(i)), image_org)
-            cv2.waitKey(0)
+            # cv2.waitKey(0)
             print('frame: {}'.format(i))
 
 
 
 if __name__ == '__main__':
-    c = (0, 0, 4, 4, 5, 4)
-    create(c)
+    c = (0, 0, 4, -1, 5, 4)
     TrackerConfig.set_configure(c)
     create(c)

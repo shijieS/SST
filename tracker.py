@@ -201,7 +201,7 @@ class TrackerConfig:
 
         roi_verify_max_iterations = [2, 3, 4, 5, 6]
 
-        roi_verify_punish_rates = [0.6, 0.4, 0.2, 0.1, 0.0]
+        roi_verify_punish_rates = [0.6, 0.4, 0.2, 0.1, 0.0, 1.0]
 
         max_track_ages = [i*3 for i in range(1,11)]
         max_track_nodes = [i*3 for i in range(1,11)]
