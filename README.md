@@ -78,13 +78,27 @@ pip install -r requirement.txt
 
 ## Dataset
 
-Our final result is based on two mot dataset [MOT17](https://motchallenge.net/data/MOT17/) and [UA-DETRAC](https://detrac-db.rit.albany.edu/). MOT 17 is focusing on tracking pedestrian, while UA-DETRAC is focusing on tracking vehicles.
+Our method is evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [MOT15](https://motchallenge.net/data/MOT15/) and [UA-DETRAC](https://detrac-db.rit.albany.edu/). 
 
-### MOT17
+> MOT15 and MOT17 is for pedestrian tracking.
+>
+> UA-DETRAC focuses is for vehicle tracking.
+
+
+
+## Train & Test On MOT17
+
+> For the simplity, we only introduce how to train and evaluate on MOT17
+
+
+### Download dataset
+
 1. Download the [mot 17 dataset 5.5 GB](https://motchallenge.net/data/MOT17.zip) and [development kit 0.5 MB](https://motchallenge.net/data/devkit.zip).
 2. Unzip this the dataset. Its folder is denoted as <MOT17_ROOT>.
 
 
+
+======**Stop Here**======
 
 ### UA-DETRAC
 
