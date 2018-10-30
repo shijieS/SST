@@ -6,42 +6,57 @@
 DAN is an end-to-end deep learning network during train phase, whose purpose is to extract the predetected objects' feature and performs pairing permutations of those features in any two frames to infer object affinities. Besides, DAN also accounts for multiple objects appearing and disappearing between video frames.
 
 > Note: The repository was built with the name "SST". For the brevity and easy understanding, we change the repository name by "DAN".
- 
 
-## Network Framework
+
+## Schematics of Deep Affinity Network (DAN)
 
 ![](./image/network.png)
 
-| Name   | Function                                                     |
+> The network can be divided into two parts: The feature extractor and Affinity extractor. The feature extractor extracts each detected objects' feature. The affinity extractor leverage the those features to compute object data association matrix.
+
+### The input & output of network
+
+#### Training phase
+
+| Name   | Items                                                        |
 | ------ | ------------------------------------------------------------ |
-| Input  | - two images (with any interval frame)<br/> - center of detected boxes <br> - matching matrix of detected boxes |
-| Output | - Features of detected boxes <br> - Similarity matrix of detected boxes |
+| Input  | - Two video frames (with any interval frame)<br/>- Center of the pre-detected boxes <br>- Binary data association matrix |
+| Output | - Loss                                                       |
+
+#### Testing phase
+
+| Name   | Items                                                        |
+| ------ | ------------------------------------------------------------ |
+| Input  | - Two video frames (with any interval frame)<br/>- Center of the pre-detected boxes |
+| Output | - Features of pre-detected boxes <br/>- Predicted matrices used to compute object affinities |
+
+
 
 ## Task
+
 ### Current Task
 
-|Title|Start|Due|Detail| Status |
-|---|---|---|---|---|
-Update ReadMe           | 2018/08/10    | -             |                                       |               |
-Re-evaluate MOT17       | 2018/08/10    | -             |                                       |               |
-Fix Result of UA-DETRAC | 2018/08/01    | -             |                                       |               |
-
+| Title         | Start      | Due  | Detail                            | Status     |
+| ------------- | ---------- | ---- | --------------------------------- | ---------- |
+| Update ReadMe | 2018/10/28 | -    | Update the README according paper | Continuing |
 
 ### History Task
-|Title|Start|Due|Detail| Status |
-|---|---|---|---|---|
-Start UA-DETRAC     | 2018/04/23        | 2018/08/09    | Everything goes well                  |   Finish      |
-Recoding framework  | 2018/05/07        | 2018/05/09    | based on similarity matrix to recoding|   Finish      |
-KITTI               | 2018/04/11        | 2018/04/23    | Training, Optimize                    |   Give up:(   |
-Re-Train KITTI      | 2018/04/18        | 2018/04/20    | with gap frame 5                      |   Finish      |
-Continue Train KITTI| 2018/04/16        | 2018/04/18    | Continue training KITTI               |   Finish      |
-Training KITTI dataset|2018/04/11       | 2018/04/16    | Training KITTI dataset                |   Finish      |
-Evaluate SST On MOT17|2018/02           | 2018/03/28    | Top 1 at MOT17                        |   Finish      |
-Start MOT17         | 2017/12           | 2018/02       | Get the primary result                |   Finish      |
-Design Framework    | 2017/11           | 2017/11       | The tracking framework                |   Finish      |
-Select Dataset      | 2017/11           | 2017/11       | MOT17, KITTI, UA-DETRAC               |   Finish      |
-Designing network   | 2017/10           | 2017/10       | Designing the network for training    |   Finish      |
-Start the project   | 2017/10           | 2017/10       | This idea is based on SSD             |   Finish      |
+
+| Title                   | Start      | Due        | Detail                             | Status    |
+| ----------------------- | ---------- | ---------- | ---------------------------------- | --------- |
+| Evaluate MOT15          | 2018/09/15 | 2018/10/20 | Evaluate on MOT15                  | Finish    |
+| Re-evaluate MOT17       | 2018/08/10 | 2018/09/01 | Re-evaluate on MOT17               | Finish    |
+| Fix Result of UA-DETRAC | 2018/08/01 | 2018/09/13 | Fix the result of UA-DETRAC        | Finish    |
+| Start UA-DETRAC         | 2018/04/23 | 2018/09/13 | Evaluate on UA-DETRAC              | Finish    |
+| KITTI                   | 2018/04/11 | 2018/04/23 | Training, Optimize                 | Give up:( |
+| Re-Train KITTI          | 2018/04/18 | 2018/04/20 | with gap frame 5                   | Finish    |
+| Continue Train KITTI    | 2018/04/16 | 2018/04/18 | Continue training KITTI            | Finish    |
+| Training KITTI dataset  | 2018/04/11 | 2018/04/16 | Training KITTI dataset             | Finish    |
+| Evaluate On MOT17       | 2018/02    | 2018/03/28 | Top 1 at MOT17 :)                  | Finish    |
+| Design Framework        | 2017/11/15 | 2018/01/14 | The tracking framework             | Finish    |
+| Select Dataset          | 2017/11/10 | 2017/11/15 | MOT17, KITTI, UA-DETRAC            | Finish    |
+| Designing network       | 2017/10/15 | 2017/11/15 | Designing the network for training | Finish    |
+| Start the project       | 2017/10/01 | 2017/10/15 | Start the idea based on SSD        | Finish    |
 
 ## Requirement
 The requirement as follows:
@@ -54,10 +69,10 @@ The requirement as follows:
 
 
 
-The python package installation script as follows:
+Run the following script to install python package:
 
 ```shell
-cd <project path>
+cd SST
 pip install -r requirement.txt
 ```
 
