@@ -69,10 +69,16 @@ The requirement as follows:
 
 
 
-Run the following script to install python package:
+> Before going on, we recommend *minconda*. After you install miniconda, then create a new environment named **DAN**, then run the following script:
+>
+> ```shell
+> conda create -n DAN python=3.5
+> source activate DAN
+> ```
+
+Run the following script to install the required python packages:
 
 ```shell
-cd SST
 pip install -r requirement.txt
 ```
 
@@ -160,6 +166,14 @@ PYTHONPAHT=. python train_kitti.py
 ```
 
 ## Citation
+
+If you use this source code or part of the source code. It is necessary to  cite the following paper:
+
+> Sun. S., Akhtar, N., Song, H.,  Mian A., & Shah M. (2018). Deep Affinity Network for Multiple Object Tracking, Retrieved from [https://arxiv.org/abs/1810.11780](https://arxiv.org/abs/1810.11780)
+
+
+
+
 
 ## CopyRight
 

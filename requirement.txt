@@ -1,11 +1,6 @@
 ## The following requirements were added by pip freeze:
-anaconda-client==1.6.6
 asn1crypto==0.23.0
-bleach==2.1.3
-certifi==2017.11.5
-cffi==1.11.2
 chardet==3.0.4
-clyent==1.2.2
 cryptography==2.1.4
 cycler==0.10.0
 decorator==4.1.2
@@ -17,7 +12,6 @@ ipykernel==4.7.0
 ipython==6.2.1
 ipython-genutils==0.2.0
 ipywidgets==7.0.5
-jedi==0.11.0
 Jinja2==2.10
 jsonschema==2.6.0
 jupyter-client==5.1.0
@@ -29,12 +23,6 @@ MarkupSafe==1.0
 matplotlib==2.1.1
 mistune==0.8.1
 motmetrics==1.1.1
-nb-anacondacloud==1.4.0
-nb-conda==2.2.1
-nb-conda-kernels==2.1.0
-nbconvert==5.3.1
-nbformat==4.4.0
-nbpresent==3.0.2
 networkx==2.0
 notebook==5.2.2
 numpy==1.14.1
