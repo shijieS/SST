@@ -2,6 +2,10 @@
 
 > readme.md is still building now.
 
+[TOC]
+
+
+
 ## Purpose
 DAN is an end-to-end deep learning network during train phase, whose purpose is to extract the predetected objects' feature and performs pairing permutations of those features in any two frames to infer object affinities. Besides, DAN also accounts for multiple objects appearing and disappearing between video frames.
 
