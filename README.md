@@ -2,11 +2,32 @@
 
 > readme.md is still building now.
 
-[TOC]
 
 
+## Table Of Content
+
+* [DAN (Deep Affinity Network)](#dan-deep-affinity-network)
+      * [Purpose](#purpose)
+          * [Deep Affinity Network (DAN)](#deep-affinity-network-dan)
+                * [The input &amp; output of network](#the-input--output-of-network)
+            * [Training phase](#training-phase)
+            * [Testing phase](#testing-phase)
+          * [Task](#task)
+                * [Current Task](#current-task)
+                * [History Task](#history-task)
+          * [Requirement](#requirement)
+          * [Dataset](#dataset)
+          * [Train &amp; Test On MOT17](#train--test-on-mot17)
+                * [Download dataset](#download-dataset)
+          * [Test](#test)
+                * [Train](#train)
+          * [Citation](#citation)
+          * [Acknowledge](#acknowledge)
+          * [License](#license)
+          * [Cool Examples:](#cool-examples)
 
 ## Purpose
+
 DAN is an end-to-end deep learning network during train phase, whose purpose is to extract the predetected objects' feature and performs pairing permutations of those features in any two frames to infer object affinities. Besides, DAN also accounts for multiple objects appearing and disappearing between video frames.
 
 > Note: The repository was built with the name "SST". For the brevity and easy understanding, we change the repository name by "DAN".
