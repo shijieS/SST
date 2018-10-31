@@ -123,7 +123,7 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
 
 ## Test
 
-1. Download the weigths from [*Dropbox need to be uploaded*]() or [BaiYunPan](https://pan.baidu.com/s/1Z5fhriuAqhqIjlY7ZI6qVg) to the **SST/weights** folder
+1. Download the weigths from [*Dropbox*](https://www.dropbox.com/s/cvtuhegqy004u57/sst300_0712_83000.pth?dl=0) or [BaiYunPan](https://pan.baidu.com/s/1Z5fhriuAqhqIjlY7ZI6qVg) to the **SST/weights** folder
 
 2. Modify **SST/config/config.py** as follows:
 
@@ -158,7 +158,7 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
 
 ### Train
 
-1. Download the vgg weights from [*Dropbox need to be uploaded*]() or [BaiYunPan](https://pan.baidu.com/s/1RRubs2zEQUUYixJQmNW68Q) to the weights folder
+1. Download the vgg weights from [*Dropbox*](https://www.dropbox.com/s/vhk55xmiauicmjk/vgg16_reducedfc.pth?dl=0) or [BaiYunPan](https://pan.baidu.com/s/1RRubs2zEQUUYixJQmNW68Q) to the weights folder
 
 2. Modify **SST/config/config.py** as follows:
 
