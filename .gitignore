@@ -1,3 +1,4 @@
 result/
 backup/
 .idea/
+config/__pycache__/config.cpython-35.pyc

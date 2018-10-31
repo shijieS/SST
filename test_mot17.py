@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='Single Shot Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
-parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
+parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
@@ -31,9 +31,9 @@ def test(choice=None):
 
     if args.type == 'test':
         dataset_index = [1, 3, 6, 7, 8, 12, 14]
-        dataset_index = [6]
+        dataset_index = [1]
         # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
-        dataset_detection_type = {'-FRCNN'}
+        dataset_detection_type = {'-DPM'}
         # dataset_detection_type = {'-DPM'}
 
     dataset_image_folder_format = os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/img1')
@@ -62,10 +62,11 @@ def test(choice=None):
         print('start processing '+saved_file_name)
         tracker = SSTTracker()
         reader = MOTDataReader(image_folder = image_folder,
-                      detection_file_name =detection_file_name)
+                      detection_file_name =detection_file_name,
+                               min_confidence=0.1)
         result = list()
         result_str = saved_file_name
-
+        first_run = True
         for i, item in enumerate(reader):
             if i > len(reader):
                 break
@@ -84,8 +85,10 @@ def test(choice=None):
 
             h, w, _ = img.shape
 
-            if i == 1 and args.save_video:
+
+            if first_run and args.save_video:
                 vw = cv2.VideoWriter(save_video_name, cv2.VideoWriter_fourcc('M','J','P','G'), 10, (w, h))
+                first_run = False
 
             det[:, [2,4]] /= float(w)
             det[:, [3,5]] /= float(h)

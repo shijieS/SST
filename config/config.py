@@ -99,7 +99,7 @@ def init_test_mot17():
     config['write_file'] = True
     config['tensorboard'] = True
     config['save_combine'] = False
-    config['type'] = 'train'
+    config['type'] = 'test'
 
 
 all_functions += [init_test_mot17]
@@ -107,15 +107,15 @@ all_functions += [init_test_mot17]
 
 def init_train_mot17():
     config['epoch_size'] = 664
-    config['mot_root'] = '/home/ssm/ssj/dataset/MOT17'
-    config['base_net_folder'] = '/home/ssm/ssj/weights/MOT17/vgg16_reducedfc.pth'
-    config['log_folder'] = '/home/ssm/ssj/weights/MOT17/0601-E120-M80-G30-log'
-    config['save_folder'] = '/home/ssm/ssj/weights/MOT17/0601-E120-M80-G30-weights'
-    config['save_images_folder'] = '/home/ssm/ssj/weights/MOT17/0601-E120-M80-G30-images'
+    config['mot_root'] = '/media/ssm/seagate/dataset/MOT17'
+    config['base_net_folder'] = '/media/ssm/seagate/ssj/weights/MOT17/vgg16_reducedfc.pth'
+    config['log_folder'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-log'
+    config['save_folder'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-weights'
+    config['save_images_folder'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-images'
     config['type'] = 'train'
     config['dataset_type'] = 'train'
     config['resume'] = None
-    config['detector'] = 'FRCNN'
+    config['detector'] = 'DPM'
     config['start_iter'] = 0
     config['iteration_epoch_num'] = 120
     config['iterations'] = config['start_iter'] + config['epoch_size'] * config['iteration_epoch_num'] + 50

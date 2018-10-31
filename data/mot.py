@@ -271,7 +271,7 @@ def test_dataset():
     l = len(dataset)
     for i in range(l):
         print(i)
-        current_image, next_image, current_boxes, next_boxes, labels = dataset[i]
+        current_image, current_boxes, next_image, next_boxes, labels = dataset[i]
         if current_image is None:
             continue
         for i, b1 in enumerate(current_boxes):
@@ -292,5 +292,5 @@ def test_dataset():
         cv2.imshow('res', image)
         cv2.waitKey(25)
 
-
-# test_dataset()
+if __name__ == '__main__':
+    test_dataset()
