@@ -123,14 +123,17 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
 
 ## Test
 
-1. Download the weigths from [Dropbox]() or [BaiYunPan](https://pan.baidu.com/s/1Z5fhriuAqhqIjlY7ZI6qVg) to the **SST/weights** folder
+1. Download the weigths from [*Dropbox need to be uploaded*]() or [BaiYunPan](https://pan.baidu.com/s/1Z5fhriuAqhqIjlY7ZI6qVg) to the **SST/weights** folder
 
 2. Modify **SST/config/config.py** as follows:
 
    ```python
-   70    def init_test_mot17():
+   # You need to modify line 8, 72, 73 and 74.
+   8	current_select_configure = 'init_test_mot17' # need use 'init_test_mot17'
+   ... ...
+   70	def init_test_mot17():
    71        config['resume'] = './weights/sst300_0712_83000.pth'
-   72        config['mot_root'] = 'replace by your dataset folder>' 
+   72        config['mot_root'] = 'replace by your dataset folder' 
    73		  config['save_folder'] = 'replace by your save folder'
    74        config['log_folder'] = 'replace by your log folder'
    75        config['batch_size'] = 1
@@ -155,6 +158,46 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
 
 ### Train
 
+1. Download the vgg weights from [*Dropbox need to be uploaded*]() or [BaiYunPan](https://pan.baidu.com/s/1RRubs2zEQUUYixJQmNW68Q) to the weights folder
+
+2. Modify **SST/config/config.py** as follows:
+
+   ```python
+   # you need to modify line 8, 87, 89, 90 and 91.
+   8	current_select_configure = 'init_train_mot17' # need use 'init_train_mot17'
+   ... ...
+   85	def init_train_mot17():
+   86		config['epoch_size'] = 664
+   87		config['mot_root'] = 'replace by your mot17 dataset folder'
+   88		config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
+   89		config['log_folder'] = 'replace by your log folder'
+   90		config['save_folder'] = 'replace by your save folder'
+   91		config['save_images_folder'] = 'replace by your image save folder'
+   92		config['type'] = 'train'
+   93		config['resume'] = None # None means training from sketch.
+   94		config['detector'] = 'DPM'
+   95		config['start_iter'] = 0
+   96		config['iteration_epoch_num'] = 120
+   97		config['iterations'] = config['start_iter'] + config['epoch_size'] *     config['iteration_epoch_num'] + 50
+   98		config['batch_size'] = 8
+   99		config['learning_rate'] = 1e-2
+   100		config['learning_rate_decay_by_epoch'] = (50, 80, 100, 110)
+   101		config['save_weight_every_epoch_num'] = 5
+   102		config['min_gap_frame'] = 0
+   103		config['max_gap_frame'] = 30
+   104		config['false_constant'] = 10
+   105		config['num_workers'] = 16
+   106		config['cuda'] = True
+   107		config['max_object'] = 80
+   108		config['min_visibility'] = 0.3
+   ```
+
+3. Run *train_mot17.py*
+
+   ```shell
+   cd <SST>
+   python train_mot17.py
+   ```
 
 
 ### UA-DETRAC
@@ -255,7 +298,6 @@ If you use this source code or part of the source code. It is necessary to  cite
 ![](./image/coolexample12.png)
 
 ![](./image/coolexample13.png)
-
 
 <!--# Log-->
 <!--## 2018/04/23 Continue Training KITTI-->

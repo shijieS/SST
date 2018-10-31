@@ -85,13 +85,12 @@ all_functions += [init_test_mot17]
 def init_train_mot17():
     config['epoch_size'] = 664
     config['mot_root'] = '/media/ssm/seagate/dataset/MOT17'
-    config['base_net_folder'] = '/media/ssm/seagate/ssj/weights/MOT17/vgg16_reducedfc.pth'
+    config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
     config['log_folder'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-log'
     config['save_folder'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-weights'
     config['save_images_folder'] = '/media/ssm/seagate/weights/MOT17/0601-E120-M80-G30-images'
     config['type'] = 'train'
-    config['dataset_type'] = 'train'
-    config['resume'] = None
+    config['resume'] = None  # None means training from sketch.
     config['detector'] = 'DPM'
     config['start_iter'] = 0
     config['iteration_epoch_num'] = 120
@@ -100,7 +99,7 @@ def init_train_mot17():
     config['learning_rate'] = 1e-2
     config['learning_rate_decay_by_epoch'] = (50, 80, 100, 110)
     config['save_weight_every_epoch_num'] = 5
-    config['min_gap_frame'] = 0
+    config['min_gap_frame'] = 0         # randomly select pair frames with the [min_gap_frame, max_gap_frame]
     config['max_gap_frame'] = 30
     config['false_constant'] = 10
     config['num_workers'] = 16

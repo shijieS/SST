@@ -224,7 +224,7 @@ class MOTTrainDataset(data.Dataset):
     def __init__(self,
                  mot_root = config['mot_root'],
                  transform=None,
-                 type=config['dataset_type'],
+                 type=config['type'],
                  detector=config['detector'],
                  max_object=config['max_object'],
                  dataset_name='MOT17'
