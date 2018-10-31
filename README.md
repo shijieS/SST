@@ -130,7 +130,7 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
    ```python
    # You need to modify line 8, 72, 73 and 74.
    8	current_select_configure = 'init_test_mot17' # need use 'init_test_mot17'
-   ... ...
+   ...	...
    70	def init_test_mot17():
    71        config['resume'] = './weights/sst300_0712_83000.pth'
    72        config['mot_root'] = 'replace by your dataset folder' 
@@ -165,7 +165,7 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
    ```python
    # you need to modify line 8, 87, 89, 90 and 91.
    8	current_select_configure = 'init_train_mot17' # need use 'init_train_mot17'
-   ... ...
+   ...	...
    85	def init_train_mot17():
    86		config['epoch_size'] = 664
    87		config['mot_root'] = 'replace by your mot17 dataset folder'
@@ -179,7 +179,7 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
    95		config['start_iter'] = 0
    96		config['iteration_epoch_num'] = 120
    97		config['iterations'] = config['start_iter'] + config['epoch_size'] *     config['iteration_epoch_num'] + 50
-   98		config['batch_size'] = 8
+   98		config['batch_size'] = 4
    99		config['learning_rate'] = 1e-2
    100		config['learning_rate_decay_by_epoch'] = (50, 80, 100, 110)
    101		config['save_weight_every_epoch_num'] = 5
@@ -200,65 +200,6 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
    ```
 
 
-### UA-DETRAC
-
-1. Download all the package in the [official set](http://detrac-db.rit.albany.edu/download) into a folder "ua", which is the root of this dataset.
-2. Use "tools/convert_mat_2_ua.py" to convert the DETRAC-Train-Annotations-MAT to the text file
-
-```shell
-unzip \*.zip
-```
-
-## Testing
-### MOT17
-- Go to the project folder
-- In config/config.py, change the configure in function init_test_mot() and decommend the code as follows:
-```python
-    init_test_mot()
-```
-- Run the following command:
-```python
-PYTHONPATH=. python test_mot.py
-```
-
-### UA-DETRAC
-
-
-### KITTI
-- Go to the project folder
-- In config/config.py, change the configure in function init_test_kitti() and decommend the code as follows:
-```python
-    init_test_kitti()
-```
-- Run the following command:
-```python
-PYTHONPATH=. python test_kitti.py
-```
-
-## Training
-We provide a convient way to train the network. Currently, MOT dataset, KITTI dataset is supported.
-## MOT
-- Go to the root folder of this project
-- In config/config.py, change the configure in function init_train_mot() and decomment the code as follows:
- ```python
-    init_train_kitti()
- ```
-- Run the following command
-```python
-PYTHONPAHT=. python train_kitti.py
-```
-
-## KITTI
-- Go to the root folder of this project
-- In config/config.py, change the configure in function init_train_kitti() and decomment the code as follows:
- ```python
-    init_train_kitti()
- ```
-- Run the following command
-```python
-PYTHONPAHT=. python train_kitti.py
-```
-
 ## Citation
 
 If you use this source code or part of the source code. It is necessary to  cite the following paper:
@@ -267,11 +208,21 @@ If you use this source code or part of the source code. It is necessary to  cite
 
 
 
+## Acknowledge
+
+This code is based on [**ssd.pytorch**](https://github.com/amdegroot/ssd.pytorch)
 
 
-## CopyRight
 
-## Some Cool Examples:
+## License
+
+>  The datasets provided on this page are published under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-nc-sa/3.0/) . This means that you must attribute the work in the manner specified by the authors, you may not use this work for commercial purposes and if you alter, transform, or build upon this work, you may distribute the resulting work only under the same license. If you are interested in commercial usage you can contact us for further options.
+
+
+
+
+
+## Cool Examples:
 
 ![](./image/coolexample1.png)
 
@@ -299,76 +250,3 @@ If you use this source code or part of the source code. It is necessary to  cite
 
 ![](./image/coolexample13.png)
 
-<!--# Log-->
-<!--## 2018/04/23 Continue Training KITTI-->
-<!--The accuracy of training kitti reaches at about 92%-->
-
-<!--|parameter name | value     |-->
-<!--|---            |---        |-->
-<!--|learning rate  | 0~40k(1e-2), 40k~50k(1e-3), 50k~55k(1e-4), 55k~70k(1e-3), 70k~75k(1e-4), 75k~80k(1e-5)|-->
-<!--|max gap        | 5         |-->
-
-<!--![](./image/accuracy20180420.png)-->
-<!--![](./image/training20180420.png)-->
-
-<!--## 2018/04/19 Problems-->
-<!--We find that it is a very difficult task when the gap frame is 30. Because, there 10m when the car's speed is 30km/s. What's more, the car has similar appearance, so it's hard to decide whether its a new object or not. As a result, the accuracy of sst net is about 83% shown as follows.-->
-
-<!--|parameter name | value |-->
-<!--|---            |---    |-->
-<!--|learning rate  |0~35k(5e-3), 35k~45k(5e-4), 45k~50k(5e-5), 50k~65k(5e-6)|-->
-<!--|maxmimum gap   |   30  |-->
-
-<!--![](./image/accuracy20180419.png)-->
-<!--![](./image/training20180419.png)-->
-
-<!--In order to solve this problem properly, we adjust the gap frame from 30 to 5.-->
-
-
-<!--## 2018/04/16 Fix the tensorboard histogram problem-->
-<!--We find the problem in showing the histogram of weight, see follows-->
-
-<!--![](./image/historgram-problem.png)-->
-
-<!--We fix this problem by replace the code-->
-
-<!--```python-->
-<!--writer.add_histogram(name, param.clone().cpu().data.numpy(), iteration)-->
-<!--```-->
-<!--by-->
-
-<!--```python-->
-<!--writer.add_histogram(name, param.clone().cpu().data.numpy(), iteration, bins='doane')-->
-<!--```-->
-
-<!--Besdies, we also fix the issue in kitti.py for reading data.-->
-
-<!--## 2018/04/14 Continue Training KITTI-->
-<!--I have tried to continue training the network by the follow paraemter-->
-
-<!--|parameter name|value|-->
-<!--|---|---|-->
-<!--learning rate | 55k~85k(1e-2), 85k~100k(1e-3)-->
-<!--maximum gap | 30-->
-
-<!--But the result is bad.-->
-<!--![](./image/training20180416.png)-->
-<!--![](./image/accuracy20180416.png)-->
-
-<!--So I plan to change the "Constant Value" from 10 to 1 and see what happens.-->
-
-<!--## 2018/04/13 Training KITTI-->
-<!--we trained the kitti dataset by the following parameters-->
-
-<!--|parameter name| value |-->
-<!--|---|---|-->
-<!--|learning rate| 0-50k(1e-2), 50k-65k(1e-3)|-->
-<!--|maximum gap| 30 |-->
-
-<!--The result and accuracy is shown below:-->
-<!--![](image/training20180410.png)-->
-<!--![](image/accuracy20180410.png)-->
-<!-- we find that if we decrease the learning or keep it as 1e-3, we get get better result.-->
-
-<!-- We also find that it's so hard to matching cars even for human being when the frame gap is 30-->
-<!--![](image/hardwhen30framegap.png)-->
