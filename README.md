@@ -8,11 +8,15 @@ DAN is an end-to-end deep learning network during train phase, whose purpose is 
 > Note: The repository was built with the name "SST". For the brevity and easy understanding, we change the repository name by "DAN".
 
 
-## Schematics of Deep Affinity Network (DAN)
+## Deep Affinity Network (DAN)
 
 ![](./image/network.png)
 
 > The network can be divided into two parts: The feature extractor and Affinity extractor. The feature extractor extracts each detected objects' feature. The affinity extractor leverage the those features to compute object data association matrix.
+
+![](./image/framework.png)
+
+> Deep tracking with DAN deployment. The **DAN** extracts the feature of each detected object provided by the *Detector*, and also estimate the affinity matrices.
 
 ### The input & output of network
 
@@ -78,19 +82,27 @@ The requirement as follows:
 
 Run the following script to install the required python packages:
 
+> If you're in China, you'd better run the following script in order to speed up the downloading.
+>
+> ```shell
+> pip install pip -U
+> pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+> ```
+
 ```shell
+cd SST
 pip install -r requirement.txt
 ```
 
+> SST is the path of our repository folder.
+
 ## Dataset
 
-Our method is evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [MOT15](https://motchallenge.net/data/MOT15/) and [UA-DETRAC](https://detrac-db.rit.albany.edu/). 
+Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [MOT15](https://motchallenge.net/data/MOT15/) and [UA-DETRAC](https://detrac-db.rit.albany.edu/). 
 
 > MOT15 and MOT17 is for pedestrian tracking.
 >
 > UA-DETRAC focuses is for vehicle tracking.
-
-
 
 ## Train & Test On MOT17
 
