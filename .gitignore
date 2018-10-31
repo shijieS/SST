@@ -1,4 +1,7 @@
 result/
 backup/
 .idea/
-config/__pycache__/config.cpython-35.pyc
+__pycache__/
+data/__pycache__/
+layer/__pycache__/
+weights/*.pth

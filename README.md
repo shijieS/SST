@@ -112,11 +112,50 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
 ### Download dataset
 
 1. Download the [mot 17 dataset 5.5 GB](https://motchallenge.net/data/MOT17.zip) and [development kit 0.5 MB](https://motchallenge.net/data/devkit.zip).
-2. Unzip this the dataset. Its folder is denoted as <MOT17_ROOT>.
+
+2. Unzip this the dataset. Here is my file structure.
+
+   ```shell
+   MOT17
+   ├── test
+   └── train
+   ```
+
+## Test
+
+1. Download the weigths from [Dropbox]() or [BaiYunPan](https://pan.baidu.com/s/1Z5fhriuAqhqIjlY7ZI6qVg) to the **SST/weights** folder
+
+2. Modify **SST/config/config.py** as follows:
+
+   ```python
+   70    def init_test_mot17():
+   71        config['resume'] = './weights/sst300_0712_83000.pth'
+   72        config['mot_root'] = 'replace by your dataset folder>' 
+   73		  config['save_folder'] = 'replace by your save folder'
+   74        config['log_folder'] = 'replace by your log folder'
+   75        config['batch_size'] = 1
+   76        config['write_file'] = True
+   77        config['tensorboard'] = True
+   78        config['save_combine'] = False
+   79        config['type'] = 'test' # or 'train'
+   ```
+
+3. run *test_mot17.py*
+
+   ```shell
+   cd <SST>
+   python test_mot17.py
+   ```
+
+   The result is shown as follows
+
+   ![](./image/mot_tracking_demo.png)
+
+   > The title of each detected boxes represents (track id, detection id)
+
+### Train
 
 
-
-======**Stop Here**======
 
 ### UA-DETRAC
 

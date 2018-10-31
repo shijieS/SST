@@ -23,18 +23,11 @@ args = parser.parse_args()
 def test(choice=None):
     if args.type == 'train':
         dataset_index = [2, 4, 5, 9, 10, 11, 13]
-        # dataset_index = [13]
-        # dataset_index = [4]
-        # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
-        # dataset_detection_type = {'-FRCNN', '-SDP'}
-        dataset_detection_type = {'-FRCNN'}
+        dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
 
     if args.type == 'test':
         dataset_index = [1, 3, 6, 7, 8, 12, 14]
-        dataset_index = [1]
-        # dataset_detection_type = {'-DPM', '-FRCNN', '-SDP'}
-        dataset_detection_type = {'-DPM'}
-        # dataset_detection_type = {'-DPM'}
+        dataset_detection_type = {'-FRCNN', '-SDP', '-DPM'}
 
     dataset_image_folder_format = os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/img1')
     detection_file_name_format=os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/det/det.txt')
@@ -63,7 +56,7 @@ def test(choice=None):
         tracker = SSTTracker()
         reader = MOTDataReader(image_folder = image_folder,
                       detection_file_name =detection_file_name,
-                               min_confidence=0.1)
+                               min_confidence=0.0)
         result = list()
         result_str = saved_file_name
         first_run = True
@@ -126,7 +119,7 @@ if __name__ == '__main__':
     i = 0
     for age in range(1):
         for node in range(1):
-            c = (0, 0, 4, 4, 5, 4)
+            c = (0, 0, 4, 0, 3, 3)
             choice_str = TrackerConfig.get_configure_str(c)
             TrackerConfig.set_configure(c)
             print('=============================={}.{}=============================='.format(i, choice_str))
