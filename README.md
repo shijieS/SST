@@ -16,12 +16,12 @@
       * [Dataset](#dataset)
       * [Train &amp; Test On MOT17](#train--test-on-mot17)
          * [Download dataset](#download-dataset)
-      * [Test](#test)
+         * [Test](#test)
          * [Train](#train)
       * [Citation](#citation)
       * [Acknowledge](#acknowledge)
       * [License](#license)
-      * [Cool Examples:](#cool-examples)
+      * [Cool Examples](#cool-examples)
 
 ## Purpose
 
@@ -144,7 +144,7 @@ Our method can be evaluated on [MOT17](https://motchallenge.net/data/MOT17/), [M
    └── train
    ```
 
-## Test
+### Test
 
 1. Download the weigths from [*Dropbox*](https://www.dropbox.com/s/cvtuhegqy004u57/sst300_0712_83000.pth?dl=0) or [BaiYunPan](https://pan.baidu.com/s/1Z5fhriuAqhqIjlY7ZI6qVg) to the **SST/weights** folder
 
@@ -245,7 +245,7 @@ This code is based on [**ssd.pytorch**](https://github.com/amdegroot/ssd.pytorch
 
 
 
-## Cool Examples:
+## Cool Examples
 
 ![](./image/coolexample1.png)
 
