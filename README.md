@@ -1,7 +1,5 @@
 # DAN (Deep Affinity Network)
 
-
-
 ## Table Of Content
 
    * [DAN (Deep Affinity Network)](#dan-deep-affinity-network)
@@ -64,14 +62,15 @@ DAN is an end-to-end deep learning network during train phase, whose purpose is 
 
 ### Current Task
 
-| Title         | Start      | Due  | Detail                            | Status     |
-| ------------- | ---------- | ---- | --------------------------------- | ---------- |
-| Update ReadMe | 2018/10/28 | -    | Update the README according paper | Continuing |
+| Title                    | Start      | Due  | Detail                            | Status     |
+| ------------------------ | ---------- | ---- | --------------------------------- | ---------- |
+| Update the result of DPM | 2018/10/31 | -    | Update the result of DPM of MOT17 | Continuing |
 
 ### History Task
 
 | Title                   | Start      | Due        | Detail                             | Status    |
 | ----------------------- | ---------- | ---------- | ---------------------------------- | --------- |
+| Update ReadMe           | 2018/10/28 | 2018/10/31 | Update the README according paper  | Finish    |
 | Evaluate MOT15          | 2018/09/15 | 2018/10/20 | Evaluate on MOT15                  | Finish    |
 | Re-evaluate MOT17       | 2018/08/10 | 2018/09/01 | Re-evaluate on MOT17               | Finish    |
 | Fix Result of UA-DETRAC | 2018/08/01 | 2018/09/13 | Fix the result of UA-DETRAC        | Finish    |
@@ -240,7 +239,7 @@ This code is based on [**ssd.pytorch**](https://github.com/amdegroot/ssd.pytorch
 
 ## License
 
->  The datasets provided on this page are published under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-nc-sa/3.0/) . This means that you must attribute the work in the manner specified by the authors, you may not use this work for commercial purposes and if you alter, transform, or build upon this work, you may distribute the resulting work only under the same license. If you are interested in commercial usage you can contact us for further options.
+>  The methods provided on this page are published under the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-nc-sa/3.0/) . This means that you must attribute the work in the manner specified by the authors, you may not use this work for commercial purposes and if you alter, transform, or build upon this work, you may distribute the resulting work only under the same license. If you are interested in commercial usage you can contact us for further options.
 
 
 
