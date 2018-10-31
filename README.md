@@ -1,7 +1,5 @@
 # DAN (Deep Affinity Network)
 
-> readme.md is still building now.
-
 
 
 ## Table Of Content
