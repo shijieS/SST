@@ -34,7 +34,7 @@ DAN is an end-to-end deep learning network during train phase, whose purpose is 
 
 ![](./image/network.png)
 
-> The network can be divided into two parts: The feature extractor and Affinity extractor. The feature extractor extracts each detected objects' feature. The affinity extractor leverage the those features to compute object data association matrix.
+> The network can be divided into two parts: feature extractor and affinity extractor. The feature extractor extracts each detected objects' features. The affinity extractor leverage those features to compute object data association matrix.
 
 ![](./image/framework.png)
 
