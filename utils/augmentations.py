@@ -254,21 +254,21 @@ class RandomSampleCrop(object):
         current_boxes = boxes[mask, :].copy()
 
         # pading the mask
-        mask = np.pad(mask,
-                      (0, config['max_object'] - len(mask)),
-                      'constant')
+        # mask = np.pad(mask,
+        #               (0, config['max_object'] - len(mask)),
+        #               'constant')
         mask = (mask == False)
 
         # take only matching gt labels
         # Important change: instead assign to zero, we should delete the row
         current_labels = labels
-        h, w = labels.shape
-        if isPre:
-            current_labels = current_labels[np.logical_not(mask), :]
-            current_labels = np.pad(current_labels, [[0, h-current_labels.shape[0]], [0, 0]], mode='constant', constant_values=0.0)
-        else:
-            current_labels = current_labels[:, np.logical_not(mask)]
-            current_labels = np.pad(current_labels, [[0, 0], [0, w - current_labels.shape[1]]], mode='constant', constant_values=0.0)
+        # h, w = labels.shape
+        # if isPre:
+        #     current_labels = current_labels[np.logical_not(mask), :]
+        #     current_labels = np.pad(current_labels, [[0, h-current_labels.shape[0]], [0, 0]], mode='constant', constant_values=0.0)
+        # else:
+        #     current_labels = current_labels[:, np.logical_not(mask)]
+        #     current_labels = np.pad(current_labels, [[0, 0], [0, w - current_labels.shape[1]]], mode='constant', constant_values=0.0)
 
         # should we use the box left and top corner or the crop's
         current_boxes[:, :2] = np.maximum(current_boxes[:, :2],
@@ -436,22 +436,24 @@ class ResizeShuffleBoxes(object):
         return op.show_matching_rectangle(img_pre, img_next, boxes_pre[:, :]*h, boxes_next[:, :]*h, labels)
 
     def __call__(self, img_pre, img_next, boxes_pre=None, boxes_next=None, labels=None):
-        resize_f = lambda boxes: \
-            (boxes.shape[0],
-             np.vstack((
-                 boxes,
-                 np.full(
-                     (config['max_object'] - len(boxes),
-                      boxes.shape[1]),
-                     np.inf
-                 ))))
+        # resize_f = lambda boxes: \
+        #     (boxes.shape[0],
+        #      np.vstack((
+        #          boxes,
+        #          np.full(
+        #              (config['max_object'] - len(boxes),
+        #               boxes.shape[1]),
+        #              np.inf
+        #          ))))
         # show the shuffling result
         # cv2.imwrite('temp_handled.jpg', self.show_matching_hanlded_rectangle(img_pre, img_next, boxes_pre, boxes_next, labels))
-        size_pre, boxes_pre = resize_f(boxes_pre)
-        size_next, boxes_next = resize_f(boxes_next)
+        # size_pre, boxes_pre = resize_f(boxes_pre)
+        # size_next, boxes_next = resize_f(boxes_next)
 
-        indexes_pre = np.arange(config['max_object'])
-        indexes_next = np.arange(config['max_object'])
+        size_pre, size_next = labels.shape
+
+        indexes_pre = np.arange(size_pre)
+        indexes_next = np.arange(size_next)
         np.random.shuffle(indexes_pre)
         np.random.shuffle(indexes_next)
 
@@ -461,25 +463,33 @@ class ResizeShuffleBoxes(object):
         labels = labels[indexes_pre, :]
         labels = labels[:, indexes_next]
 
-        mask_pre = indexes_pre < size_pre
-        mask_next = indexes_next < size_next
+        # add extra columns and rows to represents the unmatched case
+        extra_1 = (labels.sum(1) == 0)[:, None]
+        extra_0 = np.append(labels.sum(0) == 0, [False])[None, :]
+        labels = np.concatenate((labels, extra_1), axis=1)
+        labels = np.concatenate((labels, extra_0), axis=0)
+        mask_pre = np.ones(labels.shape[0], dtype=np.bool)
+        mask_next = np.ones(labels.shape[1], dtype=np.bool)
 
-        # add false object label
-        false_object_pre = (labels.sum(1) == 0).astype(float)       # should consider unmatched object
-        false_object_pre[np.logical_not(mask_pre)] = 0.0
-
-        false_object_next = (labels.sum(0) == 0).astype(float)  # should consider unmatched object
-        false_object_next[np.logical_not(mask_next)] = 0.0
-
-        false_object_pre = np.expand_dims(false_object_pre, axis=1)
-        labels = np.concatenate((labels, false_object_pre), axis=1) #60x61
-
-        false_object_next = np.append(false_object_next, [0])
-        false_object_next = np.expand_dims(false_object_next, axis=0)
-        labels = np.concatenate((labels, false_object_next), axis=0)  # 60x61
-
-        mask_pre = np.append(mask_pre, [True])  # 61
-        mask_next = np.append(mask_next, [True]) # 61
+        # mask_pre = indexes_pre < size_pre
+        # mask_next = indexes_next < size_next
+        #
+        # # add false object label
+        # false_object_pre = (labels.sum(1) == 0).astype(float)       # should consider unmatched object
+        # false_object_pre[np.logical_not(mask_pre)] = 0.0
+        #
+        # false_object_next = (labels.sum(0) == 0).astype(float)  # should consider unmatched object
+        # false_object_next[np.logical_not(mask_next)] = 0.0
+        #
+        # false_object_pre = np.expand_dims(false_object_pre, axis=1)
+        # labels = np.concatenate((labels, false_object_pre), axis=1) #60x61
+        #
+        # false_object_next = np.append(false_object_next, [0])
+        # false_object_next = np.expand_dims(false_object_next, axis=0)
+        # labels = np.concatenate((labels, false_object_next), axis=0)  # 60x61
+        #
+        # mask_pre = np.append(mask_pre, [True])  # 61
+        # mask_next = np.append(mask_next, [True]) # 61
         return img_pre, img_next, \
                [boxes_pre, mask_pre], \
                [boxes_next, mask_next], \
@@ -535,7 +545,7 @@ class ToTensor(object):
         boxes_next[0] = torch.from_numpy(boxes_next[0].astype(float))
         boxes_next[1] = torch.from_numpy(boxes_next[1].astype(np.uint8))
 
-        labels = torch.from_numpy(labels).unsqueeze(0)
+        labels = torch.from_numpy(labels).astype(int).unsqueeze(0)
 
         return img_pre, img_next, boxes_pre, boxes_next, labels
 

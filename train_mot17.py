@@ -132,7 +132,7 @@ def train():
 
     data_loader = data.DataLoader(dataset, batch_size,
                                   num_workers=args.num_workers,
-                                  shuffle=True,
+                                  shuffle=False,
                                   collate_fn=collate_fn,
                                   pin_memory=False)
 
@@ -184,7 +184,9 @@ def train():
 
         if iteration % 10 == 0:
             print('Timer: %.4f sec.' % (t1 - t0))
-            print('iter ' + repr(iteration) + ', ' + repr(epoch_size) + ' || epoch: %.4f ' % (iteration/(float)(epoch_size)) + ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
+            print('iter ' + repr(iteration) + ', ' + repr(epoch_size)
+                  + ' || epoch: %.4f ' % (iteration/(float)(epoch_size)) +
+                  ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
 
         if args.tensorboard:
             if len(all_epoch_loss) > 30:

@@ -251,11 +251,11 @@ class MOTTrainDataset(data.Dataset):
             return current_image, current_box, next_image, next_box, labels
 
         # change the label to max_object x max_object
-        labels = np.pad(labels,
-                        [(0, self.max_object - labels.shape[0]),
-                         (0, self.max_object - labels.shape[1])],
-                        mode='constant',
-                        constant_values=0)
+        # labels = np.pad(labels,
+        #                 [(0, self.max_object - labels.shape[0]),
+        #                  (0, self.max_object - labels.shape[1])],
+        #                 mode='constant',
+        #                 constant_values=0)
         return self.transform(current_image, next_image, current_box, next_box, labels)
 
     def __len__(self):
