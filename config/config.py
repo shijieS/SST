@@ -84,11 +84,11 @@ all_functions += [init_test_mot17]
 
 def init_train_mot17():
     config['epoch_size'] = 664
-    config['mot_root'] = '/media/ssj/ssm/dataset/dataset/MOT/17/MOT17'
+    config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
-    config['log_folder'] = '/media/ssj/ssm/dataset/dataset/MOT/17/mot_logs/20181222-log'
-    config['save_folder'] = '/media/ssj/ssm/dataset/dataset/MOT/17/mot_logs/20181222-weights'
-    config['save_images_folder'] = '/media/ssj/ssm/dataset/dataset/MOT/17/mot_logs/20181222-images'
+    config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190210/log'
+    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190210/weights'
+    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190210/images'
     config['type'] = 'train'
     config['resume'] = None  # None means training from sketch.
     config['detector'] = 'DPM'
