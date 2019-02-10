@@ -123,15 +123,15 @@ class GTSingleParser:
             if n.next_frame_id != -1:
                 next_frame_indexes.append(n.next_frame_id)
 
-        # 2. decide the next frame (0.5 probability to choose the farest ones, and other probability to choose the frame between them)
+        # 2. decide the next frame (0.25 probability to choose the farest ones, and other probability to choose the frame between them)
         if len(next_frame_indexes) == 0:
             return None, None , None, None, None
         if len(next_frame_indexes) == 1:
             next_frame_index = next_frame_indexes[0]
         else:
-            max_next_frame_index = max(next_frame_indexes)
+            max_next_frame_index = np.argmax(np.bincount(next_frame_indexes))
             is_choose_farest = bool(random.getrandbits(1))
-            if is_choose_farest:
+            if is_choose_farest and bool(random.getrandbits(1)):
                next_frame_index = max_next_frame_index
             else:
                 next_frame_index = random.choice(next_frame_indexes)
@@ -263,6 +263,10 @@ class MOTTrainDataset(data.Dataset):
 
 
 def test_dataset():
+    save_folder = './result/saved_images'
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+    image_index = 0
     # 1. test init function
     dataset = MOTTrainDataset()
     print(len(dataset))
@@ -287,10 +291,14 @@ def test_dataset():
             b2 = b2.astype(int)
             cv2.rectangle(current_image, tuple(b1[:2]), tuple(b1[2:]), color, 2)
             cv2.rectangle(next_image, tuple(b2[:2]), tuple(b2[2:]), color, 2)
+
         image = np.concatenate([current_image, next_image], axis=0)
         image = cv2.resize(image, (1900, 1000))
-        cv2.imshow('res', image)
-        cv2.waitKey(25)
+        image_name = os.path.join(save_folder, '{0:06}.jpg'.format(image_index))
+        image_index += 1
+        cv2.imwrite(image_name, image)
+        # cv2.imshow('res', image)
+        # cv2.waitKey(25)
 
 if __name__ == '__main__':
     test_dataset()
