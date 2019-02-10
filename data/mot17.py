@@ -108,7 +108,7 @@ class GTSingleParser:
         if not frame_index in self.recorder:
             return None, None, None, None, None
         # get current_image, current_box, next_image, next_box and labels
-        current_image = self._getimage(frame_index)
+        current_image = self._getimage(frame_index+1)
         current_boxes = list()
         current = self.recorder[frame_index]
         next_frame_indexes = list()
