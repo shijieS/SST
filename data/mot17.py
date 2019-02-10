@@ -123,7 +123,7 @@ class GTSingleParser:
             if n.next_frame_id != -1:
                 next_frame_indexes.append(n.next_frame_id)
 
-        # 2. decide the next frame (0.25 probability to choose the farest ones, and other probability to choose the frame between them)
+        # 2. decide the next frame (0.25 probability to choose the most frequent ones, and other probability to choose the frame between them)
         if len(next_frame_indexes) == 0:
             return None, None , None, None, None
         if len(next_frame_indexes) == 1:

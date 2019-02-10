@@ -99,13 +99,13 @@ def init_train_mot17():
     config['learning_rate'] = 1e-2
     config['learning_rate_decay_by_epoch'] = (50, 80, 100, 110)
     config['save_weight_every_epoch_num'] = 5
-    config['min_gap_frame'] = 0         # randomly select pair frames with the [min_gap_frame, max_gap_frame]
-    config['max_gap_frame'] = 30
+    config['min_gap_frame'] = 1         # randomly select pair frames with the [min_gap_frame, max_gap_frame]
+    config['max_gap_frame'] = 50
     config['false_constant'] = 10
     config['num_workers'] = 1 #16
     config['cuda'] = True
     config['max_object'] = 80
-    config['min_visibility'] = 0.3
+    config['min_visibility'] = 0.2
 
 
 all_functions += [init_train_mot17]
