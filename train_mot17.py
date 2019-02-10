@@ -153,25 +153,25 @@ def train():
         if args.cuda:
             img_pre = Variable(img_pre.cuda())
             img_next = Variable(img_next.cuda())
-            boxes_pre = Variable(boxes_pre.cuda())
-            boxes_next = Variable(boxes_next.cuda())
-            valid_pre = Variable(valid_pre.cuda(), volatile=True)
-            valid_next = Variable(valid_next.cuda(), volatile=True)
-            labels = Variable(labels.cuda(), volatile=True)
+            boxes_pre = [Variable(b.cuda()) for b in boxes_pre]
+            boxes_next = [Variable(b.cuda()) for b in boxes_next]
+            valid_pre = [Variable(v.cuda(), volatile=True) for v in valid_pre]
+            valid_next = [Variable(v.cuda(), volatile=True) for v in valid_next]
+            labels = [Variable(l.cuda(), volatile=True) for l in labels]
 
         else:
             img_pre = Variable(img_pre)
             img_next = Variable(img_next)
-            boxes_pre = Variable(boxes_pre)
-            boxes_next = Variable(boxes_next)
-            valid_pre = Variable(valid_pre)
-            valid_next = Variable(valid_next)
-            labels = Variable(labels, volatile=True)
+            boxes_pre = [Variable(b.cuda()) for b in boxes_pre]
+            boxes_next = [Variable(b) for b in boxes_next]
+            valid_pre = [Variable(v, volatile=True) for v in valid_pre]
+            valid_next = [Variable(v, volatile=True) for v in valid_next]
+            labels = [Variable(l, volatile=True) for l in labels]
 
 
         # forward
         t0 = time.time()
-        out = net(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next)
+        out = [net(img_pre, img_next, b_p, b_n, v_p, v_n) for b_p, b_n, v_p, v_n in zip (boxes_pre, boxes_next, valid_pre, valid_next)]
 
         optimizer.zero_grad()
         loss_pre, loss_next, loss_similarity, loss, accuracy_pre, accuracy_next, accuracy, predict_indexes = criterion(out, labels, valid_pre, valid_next)

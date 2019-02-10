@@ -62,6 +62,7 @@ class SST(nn.Module):
         :param valid_next: the next box mask, (1, 1, 61) BT
         :return: the similarity matrix
         '''
+
         sources_pre = list()
         sources_next = list()
         x_pre = self.forward_vgg(x_pre, self.vgg, sources_pre)

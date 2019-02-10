@@ -449,8 +449,10 @@ class ResizeShuffleBoxes(object):
         # cv2.imwrite('temp_handled.jpg', self.show_matching_hanlded_rectangle(img_pre, img_next, boxes_pre, boxes_next, labels))
         # size_pre, boxes_pre = resize_f(boxes_pre)
         # size_next, boxes_next = resize_f(boxes_next)
-
-        size_pre, size_next = labels.shape
+        ## Don't need to shuffle these boxes.
+        # size_pre, size_next = labels.shape
+        size_pre = boxes_pre.shape[0]
+        size_next = boxes_next.shape[0]
 
         indexes_pre = np.arange(size_pre)
         indexes_next = np.arange(size_next)
@@ -611,11 +613,11 @@ def collate_fn(batch):
     for sample in batch:
         img_pre.append(sample[0])
         img_next.append(sample[1])
-        boxes_pre.append(sample[2][0].float())
-        boxes_next.append(sample[3][0].float())
-        labels.append(sample[4].float())
-        indexes_pre.append(sample[2][1].byte())
-        indexes_next.append(sample[3][1].byte())
+        boxes_pre.append(sample[2][0].float()[None, :])
+        boxes_next.append(sample[3][0].float()[None, :])
+        labels.append(sample[4].float()[None, :])
+        indexes_pre.append(sample[2][1].byte()[None, :])
+        indexes_next.append(sample[3][1].byte()[None, :])
     return torch.stack(img_pre, 0)\
             , torch.stack(img_next, 0)\
             , boxes_pre\
