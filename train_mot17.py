@@ -9,7 +9,7 @@ from torch.autograd import Variable
 import torch.utils.data as data
 import numpy as np
 import cv2
-from data.mot import MOTTrainDataset
+from data.mot17 import MOTTrainDataset
 from config.config import config
 from layer.sst import build_sst
 from utils.augmentations import SSJAugmentation, collate_fn
@@ -43,10 +43,10 @@ parser.add_argument('--mot_root', default=config['mot_root'], help='Location of 
 args = parser.parse_args()
 
 if not os.path.exists(args.save_folder):
-    os.mkdir(args.save_folder)
+    os.makedirs(args.save_folder)
 
 if 'save_images_folder' in config and not os.path.exists(config['save_images_folder']):
-    os.mkdir(config['save_images_folder'])
+    os.makedirs(config['save_images_folder'])
 
 sst_dim = config['sst_dim']
 means = config['mean_pixel']

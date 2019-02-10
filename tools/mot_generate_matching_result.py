@@ -9,7 +9,7 @@ import torch.utils.data as data
 import numpy as np
 import argparse
 
-from data.mot import MOTTrainDataset
+from data.mot17 import MOTTrainDataset
 from config.config import config
 from layer.sst import build_sst
 from layer.sst_loss import SSTLoss
