@@ -171,7 +171,7 @@ def train():
 
         # forward
         t0 = time.time()
-        out = [net(img_pre, img_next, b_p, b_n, v_p, v_n) for b_p, b_n, v_p, v_n in zip (boxes_pre, boxes_next, valid_pre, valid_next)]
+        out = net(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next)
 
         optimizer.zero_grad()
         loss_pre, loss_next, loss_similarity, loss, accuracy_pre, accuracy_next, accuracy, predict_indexes = criterion(out, labels, valid_pre, valid_next)

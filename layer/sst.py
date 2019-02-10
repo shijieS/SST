@@ -73,24 +73,27 @@ class SST(nn.Module):
         x_next = self.forward_extras(x_next, self.extras,
                                      sources_next)
 
-        x_pre = self.forward_selector_stacker1(
-            sources_pre, l_pre, self.selector
-        )
-        x_next = self.forward_selector_stacker1(
-            sources_next, l_next, self.selector
-        )
-        # x_pre.register_hook(lambda grad: print('selector_stacker1:', grad.sum().data[0]))
-        # [B, N, N, C]
-        x = self.forward_stacker2(
-            x_pre, x_next
-        )
-        x = self.final_dp(x)
-        # [B, N, N, 1]
-        x = self.forward_final(x, self.final_net)
+        xs = list()
+        for i in range(len(l_pre)):
+            x_pre = self.forward_selector_stacker1(
+                [s[i:i+1, :] for s in sources_pre], l_pre[i], self.selector
+            )
+            x_next = self.forward_selector_stacker1(
+                [s[i:i+1, :] for s in sources_next], l_next[i], self.selector
+            )
+            # x_pre.register_hook(lambda grad: print('selector_stacker1:', grad.sum().data[0]))
+            # [B, N, N, C]
+            x = self.forward_stacker2(
+                x_pre, x_next
+            )
+            x = self.final_dp(x)
+            # [B, N, N, 1]
+            x = self.forward_final(x, self.final_net)
 
-        # add false unmatched row and column
-        x = self.add_unmatched_dim(x)
-        return x
+            # add false unmatched row and column
+            x = self.add_unmatched_dim(x)
+            xs.append(x)
+        return xs
 
     def forward_feature_extracter(self, x, l):
         '''
@@ -222,8 +225,10 @@ class SST(nn.Module):
         return torch.stack(res, 1)
 
     def forward_stacker2(self, stacker1_pre_output, stacker1_next_output):
-        stacker1_pre_output = stacker1_pre_output.unsqueeze(2).repeat(1, 1, self.max_object, 1).permute(0, 3, 1, 2)
-        stacker1_next_output = stacker1_next_output.unsqueeze(1).repeat(1, self.max_object, 1, 1).permute(0, 3, 1, 2)
+        pre_size = stacker1_pre_output.shape[1]
+        next_size = stacker1_next_output.shape[1]
+        stacker1_pre_output = stacker1_pre_output.unsqueeze(2).repeat(1, 1, next_size, 1).permute(0, 3, 1, 2)
+        stacker1_next_output = stacker1_next_output.unsqueeze(1).repeat(1, pre_size, 1, 1).permute(0, 3, 1, 2)
 
         stacker1_pre_output = self.stacker2_bn(stacker1_pre_output.contiguous())
         stacker1_next_output = self.stacker2_bn(stacker1_next_output.contiguous())
@@ -242,16 +247,14 @@ class SST(nn.Module):
         return x
 
     def add_unmatched_dim(self, x):
-        if self.false_objects_column is None:
-            self.false_objects_column = Variable(torch.ones(x.shape[0], x.shape[1], x.shape[2], 1)) * self.false_constant
-            if self.use_gpu:
-                self.false_objects_column = self.false_objects_column.cuda()
+        self.false_objects_column = Variable(torch.ones(x.shape[0], x.shape[1], x.shape[2], 1)) * self.false_constant
+        if self.use_gpu:
+            self.false_objects_column = self.false_objects_column.cuda()
         x = torch.cat([x, self.false_objects_column], 3)
 
-        if self.false_objects_row is None:
-            self.false_objects_row = Variable(torch.ones(x.shape[0], x.shape[1], 1, x.shape[3])) * self.false_constant
-            if self.use_gpu:
-                self.false_objects_row = self.false_objects_row.cuda()
+        self.false_objects_row = Variable(torch.ones(x.shape[0], x.shape[1], 1, x.shape[3])) * self.false_constant
+        if self.use_gpu:
+            self.false_objects_row = self.false_objects_row.cuda()
         x = torch.cat([x, self.false_objects_row], 2)
         return x
 
