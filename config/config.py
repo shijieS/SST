@@ -8,8 +8,8 @@ configure_names = ['init_test_mot17', 'init_train_mot17',
 current_select_configure = 'init_train_mot17'
 
 config = {
-    'mot_root': r'/home/ssm/ssj/dataset/MOT17',
-    'save_folder': '/home/ssm/ssj/weights/MOT17/weights0326-I50k-M80-G30',
+    'mot_root': r'/media/ssm/data/dataset/mot-challenge/mot17',
+    'save_folder': '/media/ssm/data/dataset/mot-challenge/mot17/logs/weights0210-I50k-M80-G30',
     'log_folder': '/home/ssm/ssj/weights/MOT17/log0326-I50k-M80-G30',
     'base_net_folder': '/home/ssm/ssj/weights/MOT17/vgg16_reducedfc.pth',
     'resume': None,
