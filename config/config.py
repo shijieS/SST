@@ -104,7 +104,7 @@ def init_train_mot17():
     config['false_constant'] = 10
     config['num_workers'] = 1 #16
     config['cuda'] = True
-    config['max_object'] = 80
+    # config['max_object'] = 80
     config['min_visibility'] = 0.2
 
 

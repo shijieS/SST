@@ -545,7 +545,7 @@ class ToTensor(object):
         boxes_next[0] = torch.from_numpy(boxes_next[0].astype(float))
         boxes_next[1] = torch.from_numpy(boxes_next[1].astype(np.uint8))
 
-        labels = torch.from_numpy(labels).astype(int).unsqueeze(0)
+        labels = torch.from_numpy(labels.astype('uint8')).unsqueeze(0)
 
         return img_pre, img_next, boxes_pre, boxes_next, labels
 
@@ -616,8 +616,10 @@ def collate_fn(batch):
         labels.append(sample[4].float())
         indexes_pre.append(sample[2][1].byte())
         indexes_next.append(sample[3][1].byte())
-    return torch.stack(img_pre, 0), torch.stack(img_next, 0), \
-           torch.stack(boxes_pre, 0), torch.stack(boxes_next, 0), \
-           torch.stack(labels, 0), \
-           torch.stack(indexes_pre, 0).unsqueeze(1), \
-           torch.stack(indexes_next, 0).unsqueeze(1)
+    return torch.stack(img_pre, 0)\
+            , torch.stack(img_next, 0)\
+            , boxes_pre\
+            , boxes_next\
+            , labels\
+            , indexes_pre\
+            , indexes_next
