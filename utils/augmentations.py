@@ -428,6 +428,9 @@ class PhotometricDistort(object):
         return self.rand_light_noise(im_pre, im_next, boxes_pre, boxes_next, labels)
 
 class ResizeShuffleBoxes(object):
+    def __init__(self, min_cut_rate = 0.7):
+        self.min_cut_rate = min_cut_rate
+
     def show_matching_hanlded_rectangle(self, img_pre, img_next, boxes_pre, boxes_next, labels):
         img_pre = (img_pre + np.array(config['mean_pixel'])).astype(np.uint8)
         img_next = (img_next + np.array(config['mean_pixel'])).astype(np.uint8)
@@ -454,16 +457,36 @@ class ResizeShuffleBoxes(object):
         size_pre = boxes_pre.shape[0]
         size_next = boxes_next.shape[0]
 
-        indexes_pre = np.arange(size_pre)
-        indexes_next = np.arange(size_next)
-        np.random.shuffle(indexes_pre)
-        np.random.shuffle(indexes_next)
+        # remove some boxes randomly
+        pre_range = list(range(size_pre))
+        np.random.shuffle(pre_range)
+        cut_rate = np.random.uniform(max(self.min_cut_rate, 1/size_pre), 1)
+        cut_num = int(cut_rate * size_pre + 0.5)
+        pre_range = pre_range[:cut_num]
 
-        boxes_pre = boxes_pre[indexes_pre, :]
-        boxes_next = boxes_next[indexes_next, :]
+        next_range = list(range(size_next))
+        np.random.shuffle(next_range)
+        cut_rate = np.random.uniform(max(self.min_cut_rate, 1 / size_next), 1)
+        cut_num = int(cut_rate * size_next + 0.5)
+        next_range = next_range[:cut_num]
 
-        labels = labels[indexes_pre, :]
-        labels = labels[:, indexes_next]
+        boxes_pre = boxes_pre[pre_range, :]
+        boxes_next = boxes_next[next_range, :]
+        labels = labels[pre_range, :][:, next_range]
+
+        size_pre = len(pre_range)
+        size_next = len(next_range)
+
+        # indexes_pre = np.arange(size_pre)
+        # indexes_next = np.arange(size_next)
+        # np.random.shuffle(indexes_pre)
+        # np.random.shuffle(indexes_next)
+        #
+        # boxes_pre = boxes_pre[indexes_pre, :]
+        # boxes_next = boxes_next[indexes_next, :]
+        #
+        # labels = labels[indexes_pre, :]
+        # labels = labels[:, indexes_next]
 
         # add extra columns and rows to represents the unmatched case
         extra_1 = (labels.sum(1) == 0)[:, None]

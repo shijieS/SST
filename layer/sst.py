@@ -76,7 +76,9 @@ class SST(nn.Module):
         xs = list()
         for i in range(len(l_pre)):
             x_pre = self.forward_selector_stacker1(
-                [s[i:i+1, :] for s in sources_pre], l_pre[i], self.selector
+                [s[i:i+1, :] for s in sources_pre],
+                l_pre[i],
+                self.selector
             )
             x_next = self.forward_selector_stacker1(
                 [s[i:i+1, :] for s in sources_next], l_next[i], self.selector
@@ -230,8 +232,10 @@ class SST(nn.Module):
         stacker1_pre_output = stacker1_pre_output.unsqueeze(2).repeat(1, 1, next_size, 1).permute(0, 3, 1, 2)
         stacker1_next_output = stacker1_next_output.unsqueeze(1).repeat(1, pre_size, 1, 1).permute(0, 3, 1, 2)
 
-        stacker1_pre_output = self.stacker2_bn(stacker1_pre_output.contiguous())
-        stacker1_next_output = self.stacker2_bn(stacker1_next_output.contiguous())
+        if stacker1_pre_output.size(2) > 1:
+            stacker1_pre_output = self.stacker2_bn(stacker1_pre_output.contiguous())
+        if stacker1_next_output.size(2) > 1:
+            stacker1_next_output = self.stacker2_bn(stacker1_next_output.contiguous())
 
         output = torch.cat(
             [stacker1_pre_output, stacker1_next_output],
@@ -243,6 +247,8 @@ class SST(nn.Module):
     def forward_final(self, x, final_net):
         x = x.contiguous()
         for f in final_net:
+            if type(f) == nn.BatchNorm2d and (x.size(2) == 1 or x.size(3) == 1):
+                continue
             x = f(x)
         return x
 

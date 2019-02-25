@@ -157,7 +157,7 @@ def train():
             boxes_next = [Variable(b.cuda()) for b in boxes_next]
             valid_pre = [Variable(v.cuda(), volatile=True) for v in valid_pre]
             valid_next = [Variable(v.cuda(), volatile=True) for v in valid_next]
-            labels = [Variable(l.cuda(), volatile=True) for l in labels]
+            labels = [Variable(l.cuda()) for l in labels]
 
         else:
             img_pre = Variable(img_pre)
@@ -166,7 +166,7 @@ def train():
             boxes_next = [Variable(b) for b in boxes_next]
             valid_pre = [Variable(v, volatile=True) for v in valid_pre]
             valid_next = [Variable(v, volatile=True) for v in valid_next]
-            labels = [Variable(l, volatile=True) for l in labels]
+            labels = [Variable(l) for l in labels]
 
 
         # forward
@@ -174,7 +174,7 @@ def train():
         out = net(img_pre, img_next, boxes_pre, boxes_next, valid_pre, valid_next)
 
         optimizer.zero_grad()
-        loss_pre, loss_next, loss_similarity, loss, accuracy_pre, accuracy_next, accuracy, predict_indexes = criterion(out, labels, valid_pre, valid_next)
+        loss_pre, loss_next, loss_similarity, loss_diff, loss, predict_indexes = criterion(out, labels)
 
         loss.backward()
         optimizer.step()
@@ -182,11 +182,14 @@ def train():
 
         all_epoch_loss += [loss.data.cpu()]
 
+        print_str = ""
         if iteration % 10 == 0:
-            print('Timer: %.4f sec.' % (t1 - t0))
-            print('iter ' + repr(iteration) + ', ' + repr(epoch_size)
-                  + ' || epoch: %.4f ' % (iteration/(float)(epoch_size)) +
-                  ' || Loss: %.4f ||' % (loss.data[0]), end=' ')
+            print_str = 'Timer: %.4f sec.\n' % (t1 - t0) \
+                        + 'iter ' + repr(iteration) + ', ' + repr(epoch_size) + ' || epoch: %.4f ' % (iteration/(float)(epoch_size)) + ' || Loss: %.4f ||' % (loss.data[0])
+            print(print_str, end=' ')
+            if args.tensorboard:
+                writer.add_text("Logs", print_str, iteration)
+
 
         if args.tensorboard:
             if len(all_epoch_loss) > 30:
@@ -197,15 +200,14 @@ def train():
             writer.add_scalar('loss/loss_pre', loss_pre.data.cpu(), iteration)
             writer.add_scalar('loss/loss_next', loss_next.data.cpu(), iteration)
             writer.add_scalar('loss/loss_similarity', loss_similarity.data.cpu(), iteration)
+            writer.add_scalar('loss/loss_diff', loss_diff.data.cpu(), iteration)
+            writer.add_scalar('time', t1-t0, iteration)
 
-            writer.add_scalar('accuracy/accuracy', accuracy.data.cpu(), iteration)
-            writer.add_scalar('accuracy/accuracy_pre', accuracy_pre.data.cpu(), iteration)
-            writer.add_scalar('accuracy/accuracy_next', accuracy_next.data.cpu(), iteration)
 
             # add weights
             if iteration % 1000 == 0:
                 for name, param in net.named_parameters():
-                    writer.add_histogram(name, param.clone().cpu().data.numpy(), iteration)
+                    writer.add_histogram(name, param.clone().cpu().data.numpy(), iteration, bins='fd')
 
             # add images
             if args.send_images and iteration % 1000 == 0:

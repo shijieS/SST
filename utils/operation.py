@@ -236,18 +236,14 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
     for i in range(batch_size):
         img1 = img_pre[i, :].permute(1, 2, 0).data
         img1 = img1.cpu().numpy() + config['mean_pixel']
-        valid1 = valid_pre[i, 0, :-1].data.cpu().numpy()
-        boxes1 = boxes_pre[i, :, 0, 0, :].data.cpu().numpy()
-        boxes1 = boxes1[valid1 == 1]
+        boxes1 = boxes_pre[i][0, :, 0, 0, :].data.cpu().numpy()
         img1 = np.clip(img1, 0, 255).astype(np.uint8).copy()
 
-        index = indexes[i, 0, :].data.cpu().numpy()[valid1==1]
+        index = indexes[i][0, 0, :].data.cpu().numpy()
 
         img2 = img_next[i, :].permute(1, 2, 0).data
         img2 = img2.cpu().numpy() + config['mean_pixel']
-        valid2 = valid_next[i, 0, :-1].data.cpu().numpy()
-        boxes2 = boxes_next[i, :, 0, 0, :].data.cpu().numpy()
-        boxes2 = boxes2[valid2 == 1]
+        boxes2 = boxes_next[i][0, :, 0, 0, :].data.cpu().numpy()
         img2 = np.clip(img2, 0, 255).astype(np.uint8).copy()
 
         # draw all circle
@@ -269,12 +265,12 @@ def show_batch_circle_image(img_pre, img_next, boxes_pre, boxes_next, valid_pre,
 
         # draw the connected boxes
         for j, b1 in enumerate(boxes1):
-            if index[j] >= config['max_object']:
+            if index[j] >= boxes_next[i].size(1):
                 continue
 
             color = tuple((np.random.rand(3) * 255).astype(int).tolist())
             start_pt = tuple(((b1 + 1) / 2.0 * config['sst_dim']).astype(int))
-            b2 = boxes_next[i, :, 0, 0, :].data.cpu().numpy()[index[j]]
+            b2 = boxes_next[i][0, :, 0, 0, :].data.cpu().numpy()[index[j]]
             end_pt = tuple(((b2 + 1) / 2.0 * config['sst_dim']).astype(int))
             end_pt = (end_pt[0], end_pt[1]+h+gap_pixel)
             img = cv2.circle(img, start_pt, 20, color, thickness=3)
