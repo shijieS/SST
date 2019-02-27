@@ -68,7 +68,7 @@ momentum = args.momentum
 if args.tensorboard:
     from tensorboardX import SummaryWriter
     if not os.path.exists(config['log_folder']):
-        os.mkdir(config['log_folder'])
+        os.makedirs(config['log_folder'])
     writer = SummaryWriter(log_dir=config['log_folder'])
 
 sst_net = build_sst('train')
@@ -132,7 +132,7 @@ def train():
 
     data_loader = data.DataLoader(dataset, batch_size,
                                   num_workers=args.num_workers,
-                                  shuffle=False,
+                                  shuffle=True,
                                   collate_fn=collate_fn,
                                   pin_memory=False)
 
