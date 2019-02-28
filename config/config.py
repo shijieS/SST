@@ -5,7 +5,7 @@ configure_names = ['init_test_mot17', 'init_train_mot17',
                    'init_train_mot15', 'init_test_mot15', 'init_test_mot15_train_dataset',
                    'init_train_ua', 'init_test_ua']
 
-current_select_configure = 'init_test_mot17'
+current_select_configure = 'init_train_mot17'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -22,7 +22,7 @@ config = {
     'false_constant': 10,
     'type': 'train', # choose from ('test', 'train')
     'dataset_type': 'train', # choose from ('test', 'train')
-    'detector': 'FRCNN', # choose from ('DPM', 'FRCNN', 'SDP')
+    'detector': 'DPM', # choose from ('DPM', 'FRCNN', 'SDP')
     'max_object': 80,  # N
     'max_gap_frame': 40, # not the hard gap
     'min_gap_frame': 0, # not the hard gap
@@ -84,11 +84,11 @@ all_functions += [init_test_mot17]
 
 def init_train_mot17():
     config['epoch_size'] = 664
-    config['mot_root'] = '/media/ssm/seagate/dataset/MOT17'
+    config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
-    config['log_folder'] = '/media/ssm/seagate/weights/MOT17/1031-E120-M80-G30-log'
-    config['save_folder'] = '/media/ssm/seagate/weights/MOT17/1031-E120-M80-G30-weights'
-    config['save_images_folder'] = '/media/ssm/seagate/weights/MOT17/1031-E120-M80-G30-images'
+    config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-remove-extra/logs'
+    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-remove-extra/weights'
+    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-remove-extra/images'
     config['type'] = 'train'
     config['resume'] = None  # None means training from sketch.
     config['detector'] = 'DPM'
