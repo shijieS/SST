@@ -32,7 +32,7 @@ class SST(nn.Module):
         # vgg network
         self.vgg = nn.ModuleList(base)
         self.extras = nn.ModuleList(extras)
-        self.selector = nn.ModuleList(selector)
+        self.selector = nn.ModuleList(selector[:3])
 
         # self.vgg_next = nn.ModuleList(base_next)
         # self.extras_next = nn.ModuleList(extras_next)
@@ -67,10 +67,10 @@ class SST(nn.Module):
         x_pre = self.forward_vgg(x_pre, self.vgg, sources_pre)
         x_next = self.forward_vgg(x_next, self.vgg, sources_next)
         # x_next.register_hook(lambda grad: print('start:', grad.sum().data[0]))
-        x_pre = self.forward_extras(x_pre, self.extras,
-                                    sources_pre)
-        x_next = self.forward_extras(x_next, self.extras,
-                                     sources_next)
+        # x_pre = self.forward_extras(x_pre, self.extras,
+        #                             sources_pre)
+        # x_next = self.forward_extras(x_next, self.extras,
+        #                              sources_next)
 
         x_pre = self.forward_selector_stacker1(
             sources_pre, l_pre, self.selector
@@ -346,18 +346,18 @@ def selector(vgg, extra_layers, batch_normal=True):
                               config['selector_channel'][k],
                               kernel_size=3,
                               padding=1)]
-    if batch_normal:
-        for k, v in enumerate(extra_layers[3::6], 3):
-            selector_layers += [nn.Conv2d(v.out_channels,
-                                 config['selector_channel'][k],
-                                 kernel_size=3,
-                                 padding=1)]
-    else:
-        for k, v in enumerate(extra_layers[3::4], 3):
-            selector_layers += [nn.Conv2d(v.out_channels,
-                                 config['selector_channel'][k],
-                                 kernel_size=3,
-                                 padding=1)]
+    # if batch_normal:
+    #     for k, v in enumerate(extra_layers[3::6], 3):
+    #         selector_layers += [nn.Conv2d(v.out_channels,
+    #                              config['selector_channel'][k],
+    #                              kernel_size=3,
+    #                              padding=1)]
+    # else:
+    #     for k, v in enumerate(extra_layers[3::4], 3):
+    #         selector_layers += [nn.Conv2d(v.out_channels,
+    #                              config['selector_channel'][k],
+    #                              kernel_size=3,
+    #                              padding=1)]
 
     return vgg, extra_layers, selector_layers
 
