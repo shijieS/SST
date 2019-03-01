@@ -43,7 +43,7 @@ parser.add_argument('--mot_root', default=config['mot_root'], help='Location of 
 args = parser.parse_args()
 
 if not os.path.exists(args.save_folder):
-    os.mkdir(args.save_folder)
+    os.makedirs(args.save_folder)
 
 if 'save_images_folder' in config and not os.path.exists(config['save_images_folder']):
     os.mkdir(config['save_images_folder'])
@@ -68,7 +68,7 @@ momentum = args.momentum
 if args.tensorboard:
     from tensorboardX import SummaryWriter
     if not os.path.exists(config['log_folder']):
-        os.mkdir(config['log_folder'])
+        os.makedirs(config['log_folder'])
     writer = SummaryWriter(log_dir=config['log_folder'])
 
 sst_net = build_sst('train')

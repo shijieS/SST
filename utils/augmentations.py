@@ -427,6 +427,34 @@ class PhotometricDistort(object):
 
         return self.rand_light_noise(im_pre, im_next, boxes_pre, boxes_next, labels)
 
+class RandomDropBoxes(object):
+    def __init__(self, save_ratio):
+        self.save_ratio = save_ratio
+
+    def get_save_index(self, max_size):
+        save_num = int(np.random.uniform(max(self.save_ratio, 1.0 / max_size), 1) * max_size + 0.5)
+        indexes = list(range(max_size))
+        np.random.shuffle(indexes)
+        all_indexes = indexes + list(range(max_size, config['max_object']))
+        return indexes[:save_num], indexes[save_num:], all_indexes
+
+
+    def __call__(self, img_pre, img_next, boxes_pre=None, boxes_next=None, labels=None):
+        save_pre_index, drop_pre_index, all_pre_index = self.get_save_index(boxes_pre.shape[0])
+        save_next_index, drop_next_index, all_next_index = self.get_save_index(boxes_next.shape[0])
+
+        boxes_pre = boxes_pre[save_pre_index, :]
+        boxes_next = boxes_next[save_next_index, :]
+        labels[drop_pre_index, :] = False
+        labels[:, drop_next_index] = False
+        labels = labels[all_pre_index, :][:, all_next_index]
+
+        # labels = labels[save_pre_index, :][:, save_next_index]
+
+        return img_pre, img_next, boxes_pre, boxes_next, labels
+
+
+
 class ResizeShuffleBoxes(object):
     def show_matching_hanlded_rectangle(self, img_pre, img_next, boxes_pre, boxes_next, labels):
         img_pre = (img_pre + np.array(config['mean_pixel'])).astype(np.uint8)
@@ -540,7 +568,7 @@ class ToTensor(object):
         return img_pre, img_next, boxes_pre, boxes_next, labels
 
 class SSJAugmentation(object):
-    def __init__(self, size=config['sst_dim'], mean=config['mean_pixel'], type=config['type']):
+    def __init__(self, size=config['sst_dim'], mean=config['mean_pixel'], type=config['type'], save_ratio=config['min_save_ratio']):
         self.mean = mean
         self.size = size
         if type == 'train':
@@ -553,6 +581,7 @@ class SSJAugmentation(object):
                 ToPercentCoords(),
                 Resize(self.size),
                 SubtractMeans(self.mean),
+                RandomDropBoxes(save_ratio),
                 ResizeShuffleBoxes(),
                 FormatBoxes(),
                 ToTensor()
