@@ -55,11 +55,11 @@ seaborn==0.8.1
 simplegeneric==0.8.1
 six==1.11.0
 tensorboardX==1.1
-tensorflow-gpu==1.4.1
+tensorflow-gpu==1.4.0
 tensorflow-tensorboard==0.4.0rc3
 terminado==0.6
 testpath==0.3.1
-torch==0.3.1
+torch==0.4.0
 torchfile==0.1.0
 torchvision==0.2.0
 tornado==4.5.2
