@@ -33,7 +33,7 @@ class SSTLoss(nn.Module):
         input_pre = nn.Softmax(dim=3)(mask_region_pre*input)
         input_next = nn.Softmax(dim=2)(mask_region_next*input)
         input_all = input_pre.clone()
-        input_all[:, :, :self.max_object, :self.max_object] = torch.mean(input_pre, input_next)[:, :, :self.max_object, :self.max_object]
+        input_all[:, :, :self.max_object, :self.max_object] = ((input_pre + input_next)/2)[:, :, :self.max_object, :self.max_object]
         # input_all[:, :, :self.max_object, :self.max_object] = ((input_pre + input_next)/2.0)[:, :, :self.max_object, :self.max_object]
         target = target.float()
         target_pre = mask_region_pre * target

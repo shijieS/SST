@@ -87,11 +87,11 @@ all_functions += [init_test_mot17]
 def init_train_mot17():
     config['epoch_size'] = 664
 
-    config['mot_root'] = '../../dataset/mot17'
+    config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
-    config['log_folder'] = '../../dataset/mot17/logs/20190304-dan-mean/logs'
-    config['save_folder'] = '../../dataset/mot17/logs/20190304-dan-mean/weights'
-    config['save_images_folder'] = '../../dataset/mot17/logs/20190304-dan-mean/images'
+    config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190304-dan-mean/logs'
+    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190304-dan-mean/weights'
+    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190304-dan-mean/images'
 
     config['type'] = 'train'
     config['resume'] = None  # None means training from sketch.
@@ -106,7 +106,7 @@ def init_train_mot17():
     config['min_gap_frame'] = 0         # randomly select pair frames with the [min_gap_frame, max_gap_frame]
     config['max_gap_frame'] = 30
     config['false_constant'] = 10
-    config['num_workers'] = 16
+    config['num_workers'] = 32
     config['cuda'] = True
     config['max_object'] = 80
     config['min_visibility'] = 0.3
