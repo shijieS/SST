@@ -318,16 +318,17 @@ def add_final(cfg, batch_normal=True):
     layers = []
     in_channels = int(cfg[0])
     layers += []
+
     # 1. add the 1:-2 layer with BatchNorm
-    for v in cfg[1:-2]:
-        conv2d = nn.Conv2d(in_channels, v, kernel_size=1, stride=1)
-        if batch_normal:
-            layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
-        else:
-            layers += [conv2d, nn.ReLU(inplace=True)]
-        in_channels = v
+    # for v in cfg[1:-2]:
+    #     conv2d = nn.Conv2d(in_channels, v, kernel_size=1, stride=1)
+    #     if batch_normal:
+    #         layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
+    #     else:
+    #         layers += [conv2d, nn.ReLU(inplace=True)]
+    #     in_channels = v
     # 2. add the -2: layer without BatchNorm for BatchNorm would make the output value normal distribution.
-    for v in cfg[-2:]:
+    for v in cfg[-1:]:
         conv2d = nn.Conv2d(in_channels, v, kernel_size=1, stride=1)
         layers += [conv2d, nn.ReLU(inplace=True)]
         in_channels = v
