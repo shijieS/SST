@@ -202,7 +202,7 @@ class SST(nn.Module):
         :return: the connected feature
         '''
         sources = [
-            F.relu(net(x), inplace=True) for net, x in zip(selector, sources)
+            x for x in sources
         ]
 
         res = list()

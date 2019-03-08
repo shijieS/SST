@@ -5,7 +5,7 @@ configure_names = ['init_test_mot17', 'init_train_mot17',
                    'init_train_mot15', 'init_test_mot15', 'init_test_mot15_train_dataset',
                    'init_train_ua', 'init_test_ua']
 
-current_select_configure = 'init_test_mot17'
+current_select_configure = 'init_train_mot17'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -59,7 +59,7 @@ config = {
 }
 
 # add the contraints
-config['final_net']['900'][0] = np.sum(config['selector_channel'])*2
+config['final_net']['900'][0] = 3584*2
 
 all_functions = []
 
