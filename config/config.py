@@ -89,9 +89,9 @@ def init_train_mot17():
 
     config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
-    config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-dan-best/logs'
-    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-dan-best/weights'
-    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-dan-best/images'
+    config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-ssj-sst-remove/logs'
+    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-ssj-sst-remove/weights'
+    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-ssj-sst-remove/images'
 
     config['type'] = 'train'
     config['resume'] = None  # None means training from sketch.
