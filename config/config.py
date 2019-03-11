@@ -87,8 +87,8 @@ def init_train_mot17():
     config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['base_net_folder'] = './weights/vgg16_reducedfc.pth'
     config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-ssj-sst-curtailed/logs'
-    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-curtailed/weights'
-    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-curtailed/images'
+    config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-ssj-sst-curtailed/weights'
+    config['save_images_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190228-ssj-sst-curtailed/images'
     config['type'] = 'train'
     config['resume'] = None  # None means training from sketch.
     config['detector'] = 'DPM'

@@ -46,7 +46,7 @@ if not os.path.exists(args.save_folder):
     os.makedirs(args.save_folder)
 
 if 'save_images_folder' in config and not os.path.exists(config['save_images_folder']):
-    os.mkdir(config['save_images_folder'])
+    os.makedirs(config['save_images_folder'])
 
 sst_dim = config['sst_dim']
 means = config['mean_pixel']
