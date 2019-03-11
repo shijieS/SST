@@ -1,11 +1,12 @@
 import numpy as np
 import json
+import os
 
 configure_names = ['init_test_mot17', 'init_train_mot17',
                    'init_train_mot15', 'init_test_mot15', 'init_test_mot15_train_dataset',
                    'init_train_ua', 'init_test_ua']
 
-current_select_configure = 'init_train_mot17'
+current_select_configure = 'init_test_mot17'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -68,11 +69,13 @@ all_functions = []
 test mot train dataset
 '''
 
+mot17_save_folder = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190304-ssj-sst-mean/'
+
 def init_test_mot17():
-    config['resume'] = './weights/sst300_0712_83000.pth'
-    config['mot_root'] = '/media/ssm/seagate/dataset/MOT17'
-    config['save_folder'] = '/media/ssm/seagate/weights0326-I50k-M80-G30'
-    config['log_folder'] = '/media/ssm/seagate/logs/1008-age-node'
+    config['resume'] = os.path.join(mot17_save_folder, 'weights/sst300_0712_79680.pth')
+    config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
+    config['save_folder'] = os.path.join(mot17_save_folder, 'test/save_folder')
+    config['log_folder'] = os.path.join(mot17_save_folder, 'test/age-node')
     config['batch_size'] = 1
     config['write_file'] = True
     config['tensorboard'] = True
