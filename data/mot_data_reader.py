@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import cv2
 import numpy as np
+from config.config import config
 
 
 class MOTDataReader:
@@ -11,7 +12,10 @@ class MOTDataReader:
         self.image_format = os.path.join(self.image_folder, '{0:06d}.jpg')
         self.detection = pd.read_csv(self.detection_file_name, header=None)
         if min_confidence is not None:
-            self.detection = self.detection[self.detection[6] > min_confidence]
+            if 'DPM/img1' in image_folder:
+                self.detection = self.detection[self.detection[6] > min_confidence/10.0]
+            else:
+                self.detection = self.detection[self.detection[6] > min_confidence]
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())
 
@@ -21,7 +25,12 @@ class MOTDataReader:
     def get_detection_by_index(self, index):
         if index > len(self.detection_group_keys) or self.detection_group_keys.count(index)==0:
             return None
-        return self.detection_group.get_group(index).values
+
+        detections = self.detection_group.get_group(index).values
+        if len(detections) >= config['max_object']:
+            detections = detections[np.argsort(detections[:, 6])[::-1], :][:config['max_object'], :]
+            print("oooops, too more objects")
+        return detections
 
     def get_image_by_index(self, index):
         if index > len(self.detection_group_keys):

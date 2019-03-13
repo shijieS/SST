@@ -80,6 +80,7 @@ def init_test_mot17():
     config['write_file'] = True
     config['tensorboard'] = True
     config['save_combine'] = False
+    config['min_confidence'] = 0.7
     config['type'] = 'test' # can be 'test' or 'train'. 'test' represents 'test dataset'. while 'train\ represents 'train dataset'
 
 

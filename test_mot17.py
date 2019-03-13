@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='Single Shot Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
-parser.add_argument('--show_image', default=True, help='show image if true, or hidden')
+parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
@@ -27,13 +27,13 @@ def test(choice=None):
 
     if args.type == 'test':
         dataset_index = [1, 3, 6, 7, 8, 12, 14]
-        dataset_detection_type = {'-FRCNN', '-SDP', '-DPM'}
+        dataset_detection_type = {'-FRCNN', '-DPM', '-SDP'}
 
     dataset_image_folder_format = os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/img1')
     detection_file_name_format=os.path.join(args.mot_root, args.type+'/MOT'+str(args.mot_version)+'-{:02}{}/det/det.txt')
 
     if not os.path.exists(args.log_folder):
-        os.mkdir(args.log_folder)
+        os.makedirs(args.log_folder)
 
     save_folder = ''
     choice_str = ''
@@ -41,7 +41,7 @@ def test(choice=None):
         choice_str = TrackerConfig.get_configure_str(choice)
         save_folder = os.path.join(args.log_folder, choice_str)
         if not os.path.exists(save_folder):
-            os.mkdir(save_folder)
+            os.makedirs(save_folder)
         # else:
         #     return
 
@@ -56,7 +56,7 @@ def test(choice=None):
         tracker = SSTTracker()
         reader = MOTDataReader(image_folder = image_folder,
                       detection_file_name =detection_file_name,
-                               min_confidence=0.0)
+                               min_confidence=config['min_confidence'])
         result = list()
         result_str = saved_file_name
         first_run = True
@@ -111,19 +111,25 @@ def test(choice=None):
     print(timer.total_time)
     print(timer.average_time)
 
+
+
+
 if __name__ == '__main__':
+
     all_choices = TrackerConfig.get_choices_age_node()
     iteration = 3
     # test()
 
     i = 0
-    for age in range(1):
-        for node in range(1):
-            c = (0, 0, 4, 0, 3, 3)
-            choice_str = TrackerConfig.get_configure_str(c)
-            TrackerConfig.set_configure(c)
-            print('=============================={}.{}=============================='.format(i, choice_str))
-            test(c)
+    for t in ['test', 'train']:
+        args.type = t
+        for age in range(1):
+            for node in range(1):
+                c = TrackerConfig.get_mot17_choice()
+                choice_str = TrackerConfig.get_configure_str(c)
+                TrackerConfig.set_configure(c)
+                print('=============================={}.{}=============================='.format(i, choice_str))
+                test(c)
             i += 1
 
     # for i in range(10):

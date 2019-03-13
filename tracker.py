@@ -86,7 +86,7 @@ class TrackUtil:
         f_min = n_min.frame_index
 
         # not recorded in recorder
-        if frame_index - f_min >= TrackerConfig.max_track_node:
+        if frame_index - f_min >= TrackerConfig.max_track_frame:
             return None
 
         return recorder.all_similarity[f_max][f_min][n_min.id, n_max.id]
@@ -145,16 +145,17 @@ class TrackUtil:
                 t1.nodes.insert(insert_pos, t2.nodes[i])
 
         # remove some nodes in t1 in order to keep t1 satisfy the max nodes
-        if len(t1.nodes) > TrackerConfig.max_track_node:
-            t1.nodes = t1.nodes[-TrackerConfig.max_track_node:]
+        if len(t1.nodes) > TrackerConfig.max_track_frame:
+            t1.nodes = t1.nodes[-TrackerConfig.max_track_frame:]
         t1.age = min(t1.age, t2.age)
         t2.valid = False
 
 class TrackerConfig:
     max_record_frame = 30
     max_track_age = 30
-    max_track_node = 30
+    max_track_frame = 30
     max_draw_track_node = 30
+    max_value_node = 8
 
     max_object = config['max_object']
     sst_model_path = config['resume']
@@ -179,7 +180,7 @@ class TrackerConfig:
     def set_configure(all_choice):
 
         min_iou_frame_gaps = [
-            # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -188,8 +189,8 @@ class TrackerConfig:
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
             ]
         min_ious = [
-            # [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
-            [0.3, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0],
+            [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
+            # [0.5, 0.4, 0.3, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0],
             [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
@@ -205,6 +206,7 @@ class TrackerConfig:
 
         max_track_ages = [i*3 for i in range(1,11)]
         max_track_nodes = [i*3 for i in range(1,11)]
+        max_value_nodes = [i*2 for i in range(1, 11)]
 
         if all_choice is None:
             return
@@ -214,7 +216,8 @@ class TrackerConfig:
         TrackerConfig.roi_verify_max_iteration = roi_verify_max_iterations[all_choice[2]]
         TrackerConfig.roi_verify_punish_rate = roi_verify_punish_rates[all_choice[3]]
         TrackerConfig.max_track_age = max_track_ages[all_choice[4]]
-        TrackerConfig.max_track_node = max_track_nodes[all_choice[5]]
+        TrackerConfig.max_track_frame = max_track_nodes[all_choice[5]]
+        TrackerConfig.max_value_node = max_value_nodes[all_choice[6]]
 
     @staticmethod
     def get_configure_str(all_choice):
@@ -240,6 +243,13 @@ class TrackerConfig:
     @staticmethod
     def get_ua_choice():
         return (5, 0, 4, 1, 5, 5)
+
+    @staticmethod
+    def get_mot17_choice():
+        # return (0, 0, 4, 0, 3, 3, 3)
+        return (3, 2, 0, 2, 5, 5, 3)
+
+
 class FeatureRecorder:
     '''
     Record features and boxes every frame
@@ -254,7 +264,7 @@ class FeatureRecorder:
         self.all_iou = {}
 
     def update(self, sst, frame_index, features, boxes):
-        # if the coming frame in the new frame
+        # if the coming frame is the new frame
         if frame_index not in self.all_frame_index:
             # if the recorder have reached the max_record_frame.
             if len(self.all_frame_index) == self.max_record_frame:
@@ -271,10 +281,13 @@ class FeatureRecorder:
             self.all_boxes[frame_index] = boxes
 
             self.all_similarity[frame_index] = {}
+
+
             for pre_index in self.all_frame_index[:-1]:
-                delta = pow(TrackerConfig.decay, (frame_index - pre_index)/3.0)
+                # delta = pow(TrackerConfig.decay, (frame_index - pre_index)/3.0)
                 pre_similarity = sst.forward_stacker_features(Variable(self.all_features[pre_index]), Variable(features), fill_up_column=False)
-                self.all_similarity[frame_index][pre_index] = pre_similarity*delta
+                self.all_similarity[frame_index][pre_index] = pre_similarity
+                # *delta
 
             self.all_iou[frame_index] = {}
             for pre_index in self.all_frame_index[:-1]:
@@ -359,7 +372,7 @@ class Node:
         return recoder.all_boxes[self.frame_index][self.id, :]
 
     def get_iou(self, frame_index, recoder, box_id):
-        if frame_index - self.frame_index >= TrackerConfig.max_track_node:
+        if frame_index - self.frame_index >= TrackerConfig.max_track_frame:
             return None
         return recoder.all_iou[frame_index][self.frame_index][self.id, box_id]
 
@@ -409,16 +422,22 @@ class Track:
 
     def get_similarity(self, frame_index, recorder):
         similarity = []
-        for n in self.nodes:
+
+        for i, n in enumerate(self.nodes[::-1]):
             f = n.frame_index
             id = n.id
-            if frame_index - f >= TrackerConfig.max_track_node:
+
+            if i >= TrackerConfig.max_value_node:
+                break
+
+            if frame_index - f >= TrackerConfig.max_track_frame:
                 continue
-            similarity += [recorder.all_similarity[frame_index][f][id, :]]
+
+            similarity += [recorder.all_similarity[frame_index][f][id, :]*(TrackerConfig.decay**(self.age/10.+i))]
 
         if len(similarity) == 0:
             return None
-        a = np.array(similarity)
+        # a = np.array(similarity)
         return np.sum(np.array(similarity), axis=0)
 
     def verify(self, frame_index, recorder, box_id):
@@ -539,7 +558,7 @@ class Tracks:
                 if b is None:
                     continue
                 txt = '({}, {})'.format(t.id, t.nodes[-1].id)
-                image = cv2.putText(image, txt, (int(b[0]*w),int((b[1])*h)), cv2.FONT_HERSHEY_SIMPLEX, 1, t.color, 3)
+                image = cv2.putText(image, txt, (int(b[0]*w),int((b[1])*h)), cv2.FONT_HERSHEY_SIMPLEX, 0.85, t.color, 3)
                 image = cv2.rectangle(image, (int(b[0]*w),int((b[1])*h)), (int((b[0]+b[2])*w), int((b[1]+b[3])*h)), t.color, 2)
 
         # draw line
@@ -579,12 +598,14 @@ class SSTTracker:
     def load_model(self):
         # load the model
         self.sst = build_sst('test', 900)
+
         if self.cuda:
             cudnn.benchmark = True
             self.sst.load_state_dict(torch.load(config['resume']))
             self.sst = self.sst.cuda()
         else:
             self.sst.load_state_dict(torch.load(config['resume'], map_location='cpu'))
+
         self.sst.eval()
 
     def update(self, image, detection, show_image, frame_index, force_init=False):
