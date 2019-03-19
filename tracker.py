@@ -190,8 +190,7 @@ class TrackerConfig:
             ]
         min_ious = [
             [0.4, 0.3, 0.25, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0],
-            # [0.5, 0.4, 0.3, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0],
-            [0.3, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
+            [0.3, 0.2, 0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0],
             [0.2, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [0.1, 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -7.0],
             [-1.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0],
@@ -204,9 +203,9 @@ class TrackerConfig:
 
         roi_verify_punish_rates = [0.6, 0.4, 0.2, 0.1, 0.0, 1.0]
 
-        max_track_ages = [i*3 for i in range(1,11)]
-        max_track_nodes = [i*3 for i in range(1,11)]
-        max_value_nodes = [i*2 for i in range(1, 11)]
+        max_track_ages = [i*5 for i in range(1,6)]
+        max_track_nodes = [i*5 for i in range(1,6)]
+        max_value_nodes = [i*3 for i in range(1,6)]
 
         if all_choice is None:
             return
@@ -226,7 +225,7 @@ class TrackerConfig:
     @staticmethod
     def get_all_choices():
         # return [(1, 1, 0, 0, 4, 2)]
-        return [(i1, i2, i3, i4, i5, i6) for i1 in range(5) for i2 in range(5) for i3 in range(5) for i4 in range(5) for i5 in range(5) for i6 in range(5)]
+        return [(i1, i2, i3, i4, i5, i6, i7) for i1 in range(5) for i2 in range(5) for i3 in range(5) for i4 in range(5) for i5 in range(5) for i6 in range(5) for i7 in range(5)]
 
     @staticmethod
     def get_all_choices_decay():
@@ -674,7 +673,7 @@ class SSTTracker:
                     break
                 verify_iteration += 1
 
-            print(verify_iteration)
+            # print(verify_iteration)
 
             #4) update the tracks
             for i in row_index:

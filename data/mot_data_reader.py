@@ -11,11 +11,11 @@ class MOTDataReader:
         self.detection_file_name = detection_file_name
         self.image_format = os.path.join(self.image_folder, '{0:06d}.jpg')
         self.detection = pd.read_csv(self.detection_file_name, header=None)
-        if min_confidence is not None:
-            if 'DPM/img1' in image_folder:
-                self.detection = self.detection[self.detection[6] > min_confidence/10.0]
-            else:
-                self.detection = self.detection[self.detection[6] > min_confidence]
+        # if min_confidence is not None:
+        #     if 'DPM/img1' in image_folder:
+        #         self.detection = self.detection[self.detection[6] > min_confidence]
+        #     else:
+        #         self.detection = self.detection[self.detection[6] > min_confidence]
         self.detection_group = self.detection.groupby(0)
         self.detection_group_keys = list(self.detection_group.indices.keys())
 

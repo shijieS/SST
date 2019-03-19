@@ -69,7 +69,7 @@ all_functions = []
 test mot train dataset
 '''
 
-mot17_save_folder = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190304-ssj-sst-mean/'
+mot17_save_folder = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-ssj-sst-max/'
 
 def init_test_mot17():
     config['resume'] = os.path.join(mot17_save_folder, 'weights/sst300_0712_79680.pth')
@@ -80,7 +80,7 @@ def init_test_mot17():
     config['write_file'] = True
     config['tensorboard'] = True
     config['save_combine'] = False
-    config['min_confidence'] = 0.7
+    config['min_confidence'] = 0.0
     config['type'] = 'test' # can be 'test' or 'train'. 'test' represents 'test dataset'. while 'train\ represents 'train dataset'
 
 

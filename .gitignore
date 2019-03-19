@@ -6,3 +6,6 @@ data/__pycache__/
 layer/__pycache__/
 utils/__pycache__/
 weights/*.pth
+evaluate_mot/ground_truth
+evaluate_mot/result
+
