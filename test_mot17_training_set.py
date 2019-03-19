@@ -7,12 +7,11 @@ from utils.timer import Timer
 import argparse
 import os
 from tqdm import trange
-from joblib import Parallel, delayed
 import pandas as pd
 from evaluate_mot import \
     read_gt_mot17, \
     get_summary_mot17, \
-    read_test_mot17_single_file, \
+    read_test_mot17_file_list, \
     mot17_post_processing
 
 
@@ -20,14 +19,12 @@ parser = argparse.ArgumentParser(description='Single Shot Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
 parser.add_argument('--type', default=config['type'], help='train/test')
-parser.add_argument('--select_index', default=-1, type= int, help='selected video indexes')
 parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
 parser.add_argument('--save_video', default=False, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
-
 
 best_config = {
     'SDP': {
@@ -61,38 +58,35 @@ best_config = {
 }
 
 
-def evaluate(choice,
-             dataset_type=args.type,
-             dataset_indexes=None,
-             detector_names=None,
-             min_confidence=config['min_confidence'],
-             gt=None):
-
-    selected_file_names = get_selected_evaluate_names(
-        dataset_type,
-        dataset_indexes,
-        detector_names
-    )
+def evaluate(dataset_type=args.type,
+             selected_file_names=None,
+             selected_config=None,
+             gt=None,
+             save_file_name="final_result.csv"):
 
     # get image folders
     dataset_root = os.path.join(args.mot_root, dataset_type)
 
-    # get save folders
-    choice_str = TrackerConfig.get_configure_str(choice)
-    save_folder = os.path.join(args.log_folder, choice_str)
-    if not os.path.exists(save_folder):
-        os.makedirs(save_folder)
-
-    # setting tracker
-    TrackerConfig.set_configure(choice)
-
     # creat summary lists if gt exists
-    if gt:
-        summaries = {}
+
+    saved_file_list = []
 
     # start evaluate each videos
     timer = Timer()
-    for base_name in selected_file_names:
+    for base_name, choice in zip(selected_file_names, selected_config):
+
+        min_confidence = choice[0]
+        choice = choice[1:]
+
+        # get save folders
+        choice_str = TrackerConfig.get_configure_str(choice)
+        save_folder = os.path.join(args.log_folder, choice_str)
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+
+        # setting tracker
+        TrackerConfig.set_configure(choice)
+
         # print('======>Start Processing {}'.format(base_name))
         # get image folder & detection file
         image_folder = os.path.join(
@@ -162,123 +156,41 @@ def evaluate(choice,
                         [i+1] + [t.id+1] + [b[0]*w, b[1]*h, b[2]*w, b[3]*h] + [-1, -1, -1, -1]
                     )
         # save the final result
+
         np.savetxt(save_txt_file, np.array(result).astype(int), fmt='%i')
 
-        # use motmetric to evaluate the saved text
-        if gt:
-
-            ts = read_test_mot17_single_file(mot17_post_processing(save_txt_file))
-            summary = get_summary_mot17(gt, ts)
-            summaries[base_name] = summary
-    return summaries
+        saved_file_list += [save_txt_file]
 
 
+    ts = read_test_mot17_file_list(saved_file_list)
+    summary = get_summary_mot17(gt, ts)
+    summary.to_csv(
+        os.path.join(args.log_folder, save_file_name)
+    )
 
-def get_selected_evaluate_names(
-        dataset_type,
-        dataset_indexes=None,
-        detector_names=None
-):
-    """
-    Get the selected video base name. If *dataset_indexes* is `None`, we use all the `train indexes` or `test indexes`. It is same for `detector_names`
 
-    Args:
-        dataset_type: ['train', 'test']
-        dataset_indexes: The selected dataset indexes list, default is None.
-        detector_names: The selected detector names, default is None.
-
-    Returns: The list of selected file base name.
-
-    """
-
-    if dataset_type == 'train':
-        if not dataset_indexes:
-            dataset_indexes = [2, 4, 5, 9, 10, 11, 13]
-        if not detector_names:
-            detector_names = {'DPM', 'FRCNN', 'SDP'}
-
-    if dataset_type == 'test':
-        if not dataset_indexes:
-            dataset_indexes = [1, 3, 6, 7, 8, 12, 14]
-        if not detector_names:
-            detector_names = {'FRCNN', 'DPM', 'SDP'}
+if __name__ == "__main__":
+    dataset_indexes = [2, 4, 5, 9, 10, 11, 13]
+    detector_names = {'FRCNN', 'SDP'}
 
     selected_file_names = [
         'MOT17-{:02}-{}'.format(i, j)
         for j in detector_names
         for i in dataset_indexes
     ]
-    return selected_file_names
+    selected_config = [
+        best_config[j][i]
+        for j in detector_names
+        for i in dataset_indexes
+    ]
 
-
-def run_test(search_num=100,
-             dataset_indexes=[2],
-             detector_names={'DPM'},
-             save_name='Result-DPM-02.csv',
-             gt=None):
-    dataset_indexes = dataset_indexes
-    detector_names = detector_names
-
-    all_choices = TrackerConfig.get_all_choices()
-    select_index = list(range(len(all_choices)))
-    np.random.shuffle(select_index)
-    select_index = select_index[:search_num]
-
-    # all_choices = [[1, 1, 2, 1, 4, 4, 3]]
-    # select_index = [0]
-
-    if not gt:
-        gt = read_gt_mot17('./evaluate_mot/ground_truth/train')
-    confidences = [0.3*i for i in range(4)]
-    # confidences = [0.0]
-    result = {}
-    all_choices = [(co, all_choices[s]) for co in confidences for s in select_index]
-    for i_, (con, choice) in zip(trange(len(all_choices)), all_choices):
-        choice_str = '{}-{}-{}-{}-{}-{}-{}-{}'.format(con, *tuple(choice))
-        summaries = evaluate(
-            choice=choice,
-            dataset_type='train',
-            dataset_indexes=dataset_indexes,
-            detector_names=detector_names,
-            min_confidence=con,
-            gt=gt
-        )
-        result[choice_str] = summaries
-
-    result_list = []
-    for c in result.keys():
-        for base_name in result[c].keys():
-            result_list += [
-                result[c][base_name].iloc[-1:, :].rename(index={'OVERALL': str(c)})
-            ]
-    result_merge = pd.concat(result_list)
-    result_merge.to_csv(
-        os.path.join(args.log_folder, save_name)
-    )
-
-
-def select_best_params():
-    dataset_indexes = [2, 4, 5, 9, 10, 11, 13]
-    detector_names = {'DPM', 'FRCNN', 'SDP'}
     gt = read_gt_mot17('./evaluate_mot/ground_truth/train')
 
-    all_scene = [([i], {j}) for i in dataset_indexes for j in detector_names]
-
-    if args.select_index > -1:
-        all_scene = [all_scene[args.select_index]]
-    print(all_scene)
-
-    # all_scene = [([4], {'DPM'})]
+    evaluate(dataset_type="train",
+             selected_file_names=selected_file_names,
+             selected_config=selected_config,
+             gt=gt,
+             save_file_name="sst-mean.csv")
 
 
-    for _i, (indexes, names) in zip(trange(len(all_scene)), all_scene):
-        save_name="{}-{}.csv".format(list(names)[0], indexes[0])
-        run_test(search_num=30,
-                 dataset_indexes=indexes,
-                 detector_names=names,
-                 save_name=save_name,
-                 gt=gt)
 
-
-if __name__ == "__main__":
-    select_best_params()

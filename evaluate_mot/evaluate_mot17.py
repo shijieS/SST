@@ -102,6 +102,16 @@ def read_test_mot17_single_file(test_path):
         )
     ])
 
+def read_test_mot17_file_list(file_list):
+    fmt= 'mot16'
+    return OrderedDict([
+        (
+            os.path.splitext(Path(f).parts[-1])[0],
+            mm.io.loadtxt(f, fmt=fmt)
+        )
+        for f in file_list
+    ])
+
 def get_summary_mot17(gt, ts):
     """
     Get the summary by the ground truth (gt) data and test data (ts).
@@ -122,10 +132,18 @@ def get_summary_mot17(gt, ts):
         generate_overall=True
     )
 
-    mm.io.render_summary(
-        summary,
-        formatters=mh.formatters,
-        namemap=mm.io.motchallenge_metric_names
+    # mm.io.render_summary(
+    #     summary,
+    #     formatters=mh.formatters,
+    #     namemap=mm.io.motchallenge_metric_names
+    # )
+
+    print(
+        mm.io.render_summary(
+            summary,
+            formatters=mh.formatters,
+            namemap=mm.io.motchallenge_metric_names
+        )
     )
 
     return summary
