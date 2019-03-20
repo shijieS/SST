@@ -69,10 +69,10 @@ all_functions = []
 test mot train dataset
 '''
 
-mot17_save_folder = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-ssj-sst-max/'
+mot17_save_folder = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190304-ssj-sst-mean'
 
 def init_test_mot17():
-    config['resume'] = os.path.join(mot17_save_folder, 'weights/sst300_0712_79680.pth')
+    config['resume'] = os.path.join(mot17_save_folder, 'weightsv1.pth')
     config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['save_folder'] = os.path.join(mot17_save_folder, 'test/save_folder')
     config['log_folder'] = os.path.join(mot17_save_folder, 'test/age-node')
