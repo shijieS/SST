@@ -18,41 +18,42 @@ from evaluate_mot import \
 parser = argparse.ArgumentParser(description='Single Shot Tracker Test')
 parser.add_argument('--version', default='v1', help='current version')
 parser.add_argument('--mot_root', default=config['mot_root'], help='MOT ROOT')
-parser.add_argument('--type', default=config['type'], help='train/test')
+parser.add_argument('--type', default='train', help='train/test')
 parser.add_argument('--show_image', default=False, help='show image if true, or hidden')
-parser.add_argument('--save_video', default=False, help='save video if true')
+parser.add_argument('--save_video', default=True, help='save video if true')
 parser.add_argument('--log_folder', default=config['log_folder'], help='video saving or result saving folder')
 parser.add_argument('--mot_version', default=17, help='mot version')
 
 args = parser.parse_args()
 
+
 best_config = {
     'SDP': {
-        2:  [0.9, 4, 2, 3, 1, 3, 3, 3],
-        4:  [0.0, 2, 4, 1, 1, 4, 3, 3],
-        5:  [0.6, 2, 0, 1, 0, 4, 4, 2],
-        9:  [0.9, 2, 3, 1, 0, 4, 3, 3],
-        10: [0.6, 4, 0, 3, 1, 4, 3, 2],
-        11: [0.6, 2, 3, 0, 4, 4, 4, 4],
-        13: [0.9, 4, 2, 4, 0, 3, 2, 2]
+        1:  [0.9, 4, 2, 3, 1, 3, 3, 3],
+        3:  [0.0, 2, 4, 1, 1, 4, 3, 3],
+        6:  [0.6, 2, 0, 1, 0, 4, 4, 2],
+        7:  [0.9, 2, 3, 1, 0, 4, 3, 3],
+        8: [0.6, 4, 0, 3, 1, 4, 3, 2],
+        12: [0.6, 2, 3, 0, 4, 4, 4, 4],
+        14: [0.9, 4, 2, 4, 0, 3, 2, 2]
     },
     'DPM': {
-        2:  [-0.5, 1, 0, 0, 0, 4, 4, 4],
-        4:  [-0.5, 1, 1, 2, 1, 4, 4, 3],
-        5:  [-0.5, 2, 3, 4, 1, 2, 3, 4],
-        9:  [-0.5, 1, 1, 4, 3, 3, 2, 1],
-        10: [-0.5, 4, 4, 0, 1, 2, 3, 2],-
-        11: [-0.5, 4, 3, 1, 0, 4, 4, 3],
-        13: [-0.5, 3, 1, 1, 0, 3, 3, 4]
+        1:  [-0.5, 1, 0, 0, 0, 4, 4, 4],
+        3:  [-0.5, 1, 1, 2, 1, 4, 4, 3],
+        6:  [-0.5, 2, 3, 4, 1, 2, 3, 4],
+        7:  [-0.5, 1, 1, 4, 3, 3, 2, 1],
+        8:  [-0.5, 4, 4, 0, 1, 2, 3, 2],
+        12: [-0.5, 4, 3, 1, 0, 4, 4, 3],
+        14: [-0.5, 3, 1, 1, 0, 3, 3, 4]
     },
     'FRCNN': {
-        2:  [0.0, 2, 2, 1, 1, 3, 4, 4],
-        4:  [0.0, 4, 1, 2, 2, 3, 4, 3],
-        5:  [0.0, 2, 2, 0, 2, 3, 2, 0],
-        9:  [0.0, 1, 1, 4, 3, 3, 2, 1],
-        10: [0.9, 2, 0, 3, 4, 4, 4, 2],
-        11: [0.0, 2, 0, 0, 2, 3, 3, 2],
-        13: [0.9, 3, 3, 0, 0, 4, 4, 1]
+        1:  [0.0, 2, 2, 1, 1, 3, 4, 4],
+        3:  [0.0, 4, 1, 2, 2, 3, 4, 3],
+        6:  [0.0, 2, 2, 0, 2, 3, 2, 0],
+        7:  [0.0, 1, 1, 4, 3, 3, 2, 1],
+        8:  [0.9, 2, 0, 3, 4, 4, 4, 2],
+        12: [0.0, 2, 0, 0, 2, 3, 3, 2],
+        14: [0.9, 3, 3, 0, 0, 4, 4, 1]
 
     }
 }
@@ -60,9 +61,7 @@ best_config = {
 
 def evaluate(dataset_type=args.type,
              selected_file_names=None,
-             selected_config=None,
-             gt=None,
-             save_file_name="final_result.csv"):
+             selected_config=None):
 
     # get image folders
     dataset_root = os.path.join(args.mot_root, dataset_type)
@@ -134,8 +133,8 @@ def evaluate(dataset_type=args.type,
                 vw = cv2.VideoWriter(save_video_file, cv2.VideoWriter_fourcc('M','J','P','G'), 10, (w, h))
                 first_run = False
 
-            det[:, [2,4]] /= float(w)
-            det[:, [3,5]] /= float(h)
+            det[:, [2, 4]] /= float(w)
+            det[:, [3, 5]] /= float(h)
             timer.tic()
             image_org = tracker.update(img, det[:, 2:6], args.show_image, i)
             timer.toc()
@@ -159,19 +158,10 @@ def evaluate(dataset_type=args.type,
 
         np.savetxt(save_txt_file, np.array(result).astype(int), fmt='%i')
 
-        saved_file_list += [save_txt_file]
-
-
-    ts = read_test_mot17_file_list(saved_file_list)
-    summary = get_summary_mot17(gt, ts)
-    summary.to_csv(
-        os.path.join(args.log_folder, save_file_name)
-    )
-
 
 if __name__ == "__main__":
-    dataset_indexes = [2, 4, 5, 9, 10, 11, 13]
-    detector_names = {'FRCNN', 'SDP'}
+    dataset_indexes = [1, 3, 6, 7, 8, 12, 14]
+    detector_names = {'FRCNN', 'DPM', 'SDP'}
 
     selected_file_names = [
         'MOT17-{:02}-{}'.format(i, j)
@@ -184,13 +174,11 @@ if __name__ == "__main__":
         for i in dataset_indexes
     ]
 
-    gt = read_gt_mot17('./evaluate_mot/ground_truth/train')
-
-    evaluate(dataset_type="train",
+    # gt = read_gt_mot17('./evaluate_mot/ground_truth/train')
+    #
+    evaluate(dataset_type="test",
              selected_file_names=selected_file_names,
-             selected_config=selected_config,
-             gt=gt,
-             save_file_name="sst-max.csv")
+             selected_config=selected_config)
 
 
 

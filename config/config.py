@@ -5,7 +5,7 @@ configure_names = ['init_test_mot17', 'init_train_mot17',
                    'init_train_mot15', 'init_test_mot15', 'init_test_mot15_train_dataset',
                    'init_train_ua', 'init_test_ua']
 
-current_select_configure = 'init_test_mot17'
+current_select_configure = 'init_test_ua'
 
 config = {
     'mot_root': r'/home/ssm/ssj/dataset/MOT17',
@@ -69,7 +69,7 @@ test mot train dataset
 '''
 
 def init_test_mot17():
-    config['resume'] = '/media/ssm/data/dataset/mot-challenge/mot17/results/loss_max/weights.pth'
+    config['resume'] = '/media/ssm/data/dataset/mot-challenge/mot17/logs/20190301-ssj-sst-max/weightsv1.pth'
     config['mot_root'] = '/media/ssm/data/dataset/mot-challenge/mot17'
     config['save_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/results/loss_max/save'
     config['log_folder'] = '/media/ssm/data/dataset/mot-challenge/mot17/results/loss_max/logs'
@@ -210,11 +210,11 @@ all_functions += [init_train_ua]
 
 
 def init_test_ua():
-    config['save_folder'] = '/media/ssm/seagate/weights/UA-DETRAC/1006-E25-M80-G30-TestSet-EB-1'
-    config['ua_image_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/Insight-MVT_Annotation_Test'
-    config['ua_detection_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/EB'
-    config['ua_ignore_root'] = '/media/ssm/seagate/dataset/UA-DETRAC/DETRAC-MOT-toolkit/evaluation/igrs'
-    config['resume'] = '/media/ssm/seagate/weights/UA-DETRAC/0621-0728-E25-M80-G30-weight/sst300_0712_114730.pth'
+    config['save_folder'] = '/home/ssj/Data/ssj/dataset/ua-detrac/logs'
+    config['ua_image_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/Insight-MVT_Annotation_Test'
+    config['ua_detection_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/EB'
+    config['ua_ignore_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/DETRAC-MOT-toolkit/evaluation/igrs'
+    config['resume'] = './weights/ua-sst300_0712_114730.pth'
     config['detector_name'] = 'EB'
     config['batch_size'] = 1
     config['min_gap_frame'] = 0
