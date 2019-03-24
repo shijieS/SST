@@ -12,7 +12,7 @@ Usage: convert_mat_2_ua --ua="ua root path"
 ''')
 
 parser = argparse.ArgumentParser(description='Convert ')
-parser.add_argument('--root', default="/media/jianliu/ssm/dataset/dataset/UA-DETRAC", help='UA-DETRAC data set root directory, such as ua, we will create one directory called gt')
+parser.add_argument('--root', default="/home/ssj/Data/ssj/dataset/ua-detrac/", help='UA-DETRAC data set root directory, such as ua, we will create one directory called gt')
 parser.add_argument('--annotations_mat', default="DETRAC-Train-Annotations-MAT", help='mat folder name')
 
 args = parser.parse_args()
@@ -63,6 +63,7 @@ class ConvertMat2UA:
             np.savetxt(file_name, res, delimiter=',', fmt="%d,%d,%1.2f,%1.2f,%1.2f,%1.2f")
 
         print('=================Well Done=================')
+
 
 if __name__ == '__main__':
     ConvertMat2UA.run(args.root, args.annotations_mat)

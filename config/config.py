@@ -210,12 +210,12 @@ all_functions += [init_train_ua]
 
 
 def init_test_ua():
-    config['save_folder'] = '/home/ssj/Data/ssj/dataset/ua-detrac/logs'
+    config['save_folder'] = '/home/ssj/Data/ssj/dataset/ua-detrac/logs-DPM'
     config['ua_image_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/Insight-MVT_Annotation_Test'
-    config['ua_detection_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/EB'
+    config['ua_detection_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/DPM'
     config['ua_ignore_root'] = '/home/ssj/Data/ssj/dataset/ua-detrac/DETRAC-MOT-toolkit/evaluation/igrs'
     config['resume'] = './weights/ua-sst300_0712_114730.pth'
-    config['detector_name'] = 'EB'
+    config['detector_name'] = 'DPM'
     config['batch_size'] = 1
     config['min_gap_frame'] = 0
     config['max_gap_frame'] = 30
@@ -223,6 +223,7 @@ def init_test_ua():
     config['cuda'] = True
     config['max_object'] = 80
     config['type'] = 'train'
+
 all_functions += [init_test_ua]
 
 for f in all_functions:
