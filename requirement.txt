@@ -69,5 +69,5 @@ urllib3==1.22
 visdom==0.1.7
 wcwidth==0.1.7
 webencodings==0.5.1
-Werkzeug==0.13
+Werkzeug==0.15.3
 widgetsnbextension==3.0.8
