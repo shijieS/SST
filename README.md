@@ -1,4 +1,7 @@
+News: I've released my new work on MOT. This tracker is named as [Deep Motion Modeling Network (DMMN)](https://github.com/shijieS/DMMN) which can simultaneously perform detection, feature modeling, association, and even prediction. Besides, this work is based on the framework of SSD, which can be extended to the framework of Faster RCNN, YOLO v3/4. 
+
 # DAN (Deep Affinity Network)
+
 
 ## Table Of Content
 
