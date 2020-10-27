@@ -1,7 +1,7 @@
 ## The following requirements were added by pip freeze:
 asn1crypto==0.23.0
 chardet==3.0.4
-cryptography==2.1.4
+cryptography==3.2
 cycler==0.10.0
 decorator==4.1.2
 entrypoints==0.2.3
